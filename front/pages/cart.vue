@@ -64,12 +64,12 @@
                 Finalizar Pedido
               </NuxtLink>
 
-              <button
+              <!-- <button
                 @click="clearCart"
                 class="w-full mt-3 text-red-600 hover:text-red-700 font-medium py-2 transition-colors"
               >
                 Vaciar Carrito
-              </button>
+              </button> -->
             </div>
           </div>
         </div>

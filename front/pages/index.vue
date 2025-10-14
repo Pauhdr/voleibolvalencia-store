@@ -1,34 +1,13 @@
 <template>
-  <div class="container-custom py-8">
+  <div class="container-custom py-12">
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-display font-bold text-gray-900 mb-2">
+    <div class="mb-12 text-center">
+      <h1 class="text-5xl font-display font-bold text-gray-900 mb-3">
         Tienda Oficial
       </h1>
-      <p class="text-gray-600">
+      <p class="text-lg text-gray-600">
         Compra la equipación oficial del Club Voleibol Valencia
       </p>
-    </div>
-
-    <!-- Aviso sobre tallas -->
-    <div class="mb-8 bg-gradient-to-r from-orange-50 to-orange-100 border-l-4 border-orange-600 p-5 rounded-lg shadow-sm">
-      <div class="flex items-start">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <div class="flex-grow">
-          <p class="font-bold text-orange-900 text-lg mb-1">¡IMPORTANTE!</p>
-          <p class="text-orange-800 mb-3">
-            Las tallas son <strong>diferentes para chico y chica</strong>. Por favor, consulta la guía de tallas antes de hacer tu pedido.
-          </p>
-          <button
-            @click="showSizeGuide = true"
-            class="btn-outline text-sm py-2 px-4"
-          >
-            📏 Ver Guía de Tallas
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- Loading state -->
@@ -46,7 +25,7 @@
     </div>
 
     <!-- Productos -->
-    <div v-else-if="products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       <ProductCard
         v-for="product in products"
         :key="product.id"
@@ -61,12 +40,6 @@
       </svg>
       <p class="text-gray-600">No hay productos disponibles en este momento</p>
     </div>
-
-    <!-- Modal de guía de tallas -->
-    <SizeGuideModal
-      :is-open="showSizeGuide"
-      @close="showSizeGuide = false"
-    />
   </div>
 </template>
 
@@ -80,7 +53,6 @@ const { getProducts } = usePocketBase();
 const products = ref<Product[]>([]);
 const loading = ref(true);
 const error = ref('');
-const showSizeGuide = ref(false);
 
 const loadProducts = async () => {
   loading.value = true;
