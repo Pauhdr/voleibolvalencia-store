@@ -1,0 +1,213 @@
+<template>
+  <div class="space-y-4">
+    <!-- Talla -->
+    <div v-if="product.options.hasTalla">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Talla <span class="text-red-500">*</span>
+      </label>
+      <select v-model="selectedOptions.talla" class="select-field">
+        <option value="">Selecciona una talla</option>
+        <option
+          v-for="talla in product.options.tallas"
+          :key="talla"
+          :value="talla"
+        >
+          {{ talla }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Género -->
+    <div v-if="product.options.hasGenero">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Género <span class="text-red-500">*</span>
+      </label>
+      <div class="grid grid-cols-2 gap-3">
+        <button
+          v-for="genero in product.options.generos"
+          :key="genero"
+          type="button"
+          @click="selectedOptions.genero = genero"
+          :class="[
+            'py-2 px-4 rounded-lg font-medium transition-all',
+            selectedOptions.genero === genero
+              ? 'bg-orange-600 text-white shadow-md'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          ]"
+        >
+          {{ genero }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Color (para llaveros) -->
+    <div v-if="product.options.hasColor">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Color <span class="text-red-500">*</span>
+      </label>
+      <select v-model="selectedOptions.color" class="select-field">
+        <option value="">Selecciona un color</option>
+        <option
+          v-for="color in product.options.colores"
+          :key="color"
+          :value="color"
+        >
+          {{ color }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Número (opcional) -->
+    <div v-if="product.options.hasNumero">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Número <span class="text-gray-500 text-xs">(opcional)</span>
+      </label>
+      <input
+        v-model="selectedOptions.numero"
+        type="text"
+        maxlength="2"
+        placeholder="Ej: 10"
+        class="input-field"
+      />
+    </div>
+
+    <!-- Nombre (opcional) -->
+    <div v-if="product.options.hasNombre">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Nombre <span class="text-gray-500 text-xs">(opcional)</span>
+      </label>
+      <input
+        v-model="selectedOptions.nombre"
+        type="text"
+        maxlength="20"
+        placeholder="Ej: GARCÍA"
+        class="input-field"
+      />
+    </div>
+
+    <!-- Cantidad -->
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Cantidad
+      </label>
+      <div class="flex items-center space-x-3">
+        <button
+          type="button"
+          @click="decrementQuantity"
+          class="w-10 h-10 rounded-lg bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-gray-700 transition-colors"
+        >
+          -
+        </button>
+        <input
+          v-model.number="quantity"
+          type="number"
+          min="1"
+          class="w-20 text-center input-field"
+        />
+        <button
+          type="button"
+          @click="incrementQuantity"
+          class="w-10 h-10 rounded-lg bg-orange-600 hover:bg-orange-700 flex items-center justify-center font-bold text-white transition-colors"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    <!-- Botón añadir al carrito -->
+    <button
+      type="button"
+      @click="addToCart"
+      :disabled="!isValid"
+      class="btn-primary w-full mt-4"
+    >
+      <span v-if="isValid">Añadir al carrito</span>
+      <span v-else>Completa las opciones requeridas</span>
+    </button>
+
+    <!-- Mensaje de error -->
+    <p v-if="errorMessage" class="text-red-600 text-sm text-center">
+      {{ errorMessage }}
+    </p>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import type { Product, SelectedOptions, CartItem } from '~/types';
+import { useCartStore } from '~/stores/cart';
+
+interface Props {
+  product: Product;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{
+  (e: 'add-to-cart', item: CartItem): void;
+}>();
+
+const cartStore = useCartStore();
+
+// Estado local
+const selectedOptions = ref<SelectedOptions>({
+  talla: '',
+  genero: '',
+  nombre: '',
+  numero: '',
+  color: '',
+});
+
+const quantity = ref(1);
+const errorMessage = ref('');
+
+// Validación
+const isValid = computed(() => {
+  if (props.product.options.hasTalla && !selectedOptions.value.talla) return false;
+  if (props.product.options.hasGenero && !selectedOptions.value.genero) return false;
+  if (props.product.options.hasColor && !selectedOptions.value.color) return false;
+  return true;
+});
+
+// Métodos
+const incrementQuantity = () => {
+  quantity.value++;
+};
+
+const decrementQuantity = () => {
+  if (quantity.value > 1) {
+    quantity.value--;
+  }
+};
+
+const addToCart = () => {
+  if (!isValid.value) {
+    errorMessage.value = 'Por favor, completa todas las opciones requeridas';
+    return;
+  }
+
+  const cartItem: CartItem = {
+    product_id: props.product.id,
+    name: props.product.name,
+    quantity: quantity.value,
+    price: props.product.price,
+    image: props.product.image,
+    options: { ...selectedOptions.value },
+  };
+
+  cartStore.addItem(cartItem);
+  
+  // Resetear formulario
+  selectedOptions.value = {
+    talla: '',
+    genero: '',
+    nombre: '',
+    numero: '',
+    color: '',
+  };
+  quantity.value = 1;
+  errorMessage.value = '';
+
+  // Mostrar feedback
+  alert('Producto añadido al carrito');
+};
+</script>
