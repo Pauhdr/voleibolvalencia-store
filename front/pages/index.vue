@@ -6,7 +6,7 @@
         Tienda Oficial
       </h1>
       <p class="text-lg text-gray-600">
-        Compra la equipación oficial del Club Voleibol Valencia
+        Compra la ropa oficial del Club Voleibol Valencia
       </p>
     </div>
 

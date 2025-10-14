@@ -21,9 +21,21 @@ export default defineNuxtConfig({
     head: {
       title: 'Voleibol Valencia Store',
       meta: [
-        { name: 'description', content: 'Compra la equipación oficial del Club Voleibol Valencia.' }
+        { name: 'description', content: 'Compra la ropa oficial del Club Voleibol Valencia.' },
+        { name: 'theme-color', content: '#ea580c' }
       ],
       link: [
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '32x32',
+          href: '/favicon.png'
+        },
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: '/favicon.png'
+        },
         {
           rel: 'preconnect',
           href: 'https://fonts.googleapis.com'

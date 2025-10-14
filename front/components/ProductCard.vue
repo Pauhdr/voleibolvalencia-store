@@ -36,13 +36,13 @@
       <!-- Contenido -->
       <div class="p-5">
         <!-- Nombre del producto -->
-        <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-orange-600 transition-colors">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem] transition-colors">
           {{ product.name }}
         </h3>
 
         <!-- Precio -->
         <div class="flex items-baseline justify-between">
-          <p class="text-2xl font-bold text-orange-600">
+          <p class="text-2xl font-bold">
             {{ product.price.toFixed(2) }}€
           </p>
           
@@ -50,7 +50,7 @@
           <div class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-50 text-orange-600 transition-all group-hover:bg-orange-600 group-hover:text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+              class="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

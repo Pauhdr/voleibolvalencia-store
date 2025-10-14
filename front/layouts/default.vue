@@ -6,11 +6,12 @@
         <div class="flex items-center justify-between">
           <!-- Logo y título -->
           <NuxtLink to="/" class="flex items-center space-x-3 group">
-            <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-              <span class="text-white font-bold text-xl">VV</span>
+            <div class="w-12 h-12 rounded-full flex items-center justify-center">
+              <!-- <span class="text-white font-bold text-xl">VV</span> -->
+               <img src="../assets/img/logo.png" alt="cvv logo" class="rounded-full object-fill">
             </div>
             <div>
-              <h1 class="text-xl font-display font-bold text-gray-900">Voleibol Valencia</h1>
+              <h1 class="text-xl font-display font-bold text-gray-900">CV Valencia</h1>
               <p class="text-xs text-gray-600">Tienda Oficial</p>
             </div>
           </NuxtLink>
@@ -63,12 +64,12 @@
           <div>
             <h3 class="font-display font-bold text-lg mb-3">Voleibol Valencia</h3>
             <p class="text-gray-400 text-sm">
-              Club deportivo dedicado al voleibol desde hace más de 40 años.
+              Club deportivo dedicado al voleibol desde hace 40 años.
             </p>
           </div>
 
           <!-- Datos bancarios -->
-          <div>
+          <!-- <div>
             <h3 class="font-display font-bold text-lg mb-3">Datos de Transferencia</h3>
             <p class="text-gray-400 text-sm">
               <strong class="text-white">IBAN:</strong> ES12 3456 7890 1234 5678 9012
@@ -76,7 +77,7 @@
             <p class="text-gray-400 text-sm mt-1">
               <strong class="text-white">Concepto:</strong> Nombre del jugador + Equipo
             </p>
-          </div>
+          </div> -->
 
           <!-- Contacto -->
           <div>

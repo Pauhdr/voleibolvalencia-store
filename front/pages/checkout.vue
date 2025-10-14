@@ -39,8 +39,12 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 Equipo <span class="text-red-500">*</span>
               </label>
-              <select v-model="formData.team" required class="select-field">
-                <option value="">Selecciona un equipo</option>
+              <select
+                v-model="formData.team"
+                required
+                class="input-field"
+              >
+                <option value="" disabled>Selecciona un equipo</option>
                 <option v-for="team in TEAMS" :key="team" :value="team">
                   {{ team }}
                 </option>
@@ -48,7 +52,7 @@
             </div>
 
             <!-- Nombre del padre/madre -->
-            <div>
+            <div class="md:col-span-2">
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 Nombre del Padre/Madre <span class="text-red-500">*</span>
               </label>
@@ -57,12 +61,12 @@
                 type="text"
                 required
                 class="input-field"
-                placeholder="Ej: Juan García"
+                placeholder="Ej: Juan García López"
               />
             </div>
 
             <!-- Email -->
-            <div>
+            <div class="md:col-span-2">
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 Email <span class="text-red-500">*</span>
               </label>
@@ -230,8 +234,24 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '~/stores/cart';
 import { usePocketBase } from '~/composables/usePocketBase';
-import { TEAMS } from '~/types';
 import type { BuyerData } from '~/types';
+
+const TEAMS = [
+  'Mini Naranja',
+  'Mini Azul',
+  'Benjamín Naranja',
+  'Benjamín Azul',
+  'Alevín Naranja',
+  'Alevín Azul',
+  'Infantil Naranja',
+  'Infantil Azul',
+  'Cadete Naranja',
+  'Cadete Azul',
+  'Juvenil Naranja',
+  'Juvenil Azul',
+  'Primera División',
+  'Segunda División',
+];
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -243,11 +263,11 @@ if (cartStore.isEmpty) {
 }
 
 // Estado del formulario
-const formData = ref<BuyerData & { transfer_reference?: string }>({
-  player_name: cartStore.buyerData?.player_name || '',
-  team: cartStore.buyerData?.team || '',
-  parent_name: cartStore.buyerData?.parent_name || '',
-  email: cartStore.buyerData?.email || '',
+const formData = ref({
+  player_name: '',
+  team: '',
+  parent_name: '',
+  email: '',
   transfer_reference: '',
 });
 
@@ -311,15 +331,25 @@ const handleSubmit = async () => {
 
     // Crear pedido en PocketBase
     const orderData = {
-      buyer_name: formData.value.parent_name,
-      buyer_email: formData.value.email,
       player_name: formData.value.player_name,
       team: formData.value.team,
+      parent_name: formData.value.parent_name,
+      email: formData.value.email,
+      transfer_reference: formData.value.transfer_reference || undefined,
       products: cartStore.items,
       total: cartStore.total,
-      transfer_reference: formData.value.transfer_reference,
-      proof: selectedFile.value!,
+      payment_proof: selectedFile.value!,
     };
+
+    console.log('📦 Enviando pedido:', {
+      player_name: orderData.player_name,
+      team: orderData.team,
+      parent_name: orderData.parent_name,
+      email: orderData.email,
+      products_count: cartStore.items.length,
+      total: orderData.total,
+      proof_file: selectedFile.value?.name,
+    });
 
     const order = await createOrder(orderData);
 
@@ -332,7 +362,7 @@ const handleSubmit = async () => {
     }
   } catch (error: any) {
     console.error('Error creating order:', error);
-    errorMessage.value = 'Hubo un error al enviar el pedido. Por favor, inténtalo de nuevo.';
+    errorMessage.value = error.message || 'Hubo un error al enviar el pedido. Por favor, inténtalo de nuevo.';
   } finally {
     submitting.value = false;
   }

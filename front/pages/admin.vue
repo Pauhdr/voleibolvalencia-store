@@ -188,12 +188,20 @@
 
                 <div class="grid grid-cols-2 gap-4 mb-4">
                   <div>
+                    <p class="text-sm text-gray-600">Jugador/a</p>
+                    <p class="font-semibold text-gray-900">{{ order.player_name }}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600">Equipo</p>
+                    <p class="font-semibold text-gray-900">{{ order.team }}</p>
+                  </div>
+                  <div>
                     <p class="text-sm text-gray-600">Padre/Madre</p>
-                    <p class="font-semibold text-gray-900">{{ order.buyer_name }}</p>
+                    <p class="font-semibold text-gray-900">{{ order.parent_name }}</p>
                   </div>
                   <div>
                     <p class="text-sm text-gray-600">Email</p>
-                    <p class="font-semibold text-gray-900">{{ order.buyer_email }}</p>
+                    <p class="font-semibold text-gray-900">{{ order.email }}</p>
                   </div>
                   <div>
                     <p class="text-sm text-gray-600">Total</p>
@@ -212,7 +220,7 @@
                   <p class="text-sm font-semibold text-gray-700 mb-2">Productos:</p>
                   <ul class="space-y-2">
                     <li
-                      v-for="(product, index) in order.products"
+                      v-for="(product, index) in order.items"
                       :key="index"
                       class="text-sm text-gray-700 flex justify-between"
                     >
@@ -272,7 +280,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { usePocketBase } from '~/composables/usePocketBase';
-import type { Order } from '~/types';
+import type { Order, OrderStatus } from '~/types';
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '~/types';
 
 const { loginAdmin, logoutAdmin, isAuthenticated, getOrders, updateOrderStatus, getFileUrl } = usePocketBase();
 
@@ -289,10 +298,11 @@ const orders = ref<Order[]>([]);
 const loading = ref(false);
 const filterStatus = ref('');
 
-// Contadores
-const pendingCount = computed(() => orders.value.filter(o => o.status === 'pendiente').length);
+// Contadores actualizados con los nuevos estados
+const pendingCount = computed(() => orders.value.filter(o => o.status === 'en_revision').length);
 const reviewedCount = computed(() => orders.value.filter(o => o.status === 'revisado').length);
-const deliveredCount = computed(() => orders.value.filter(o => o.status === 'entregado').length);
+const readyCount = computed(() => orders.value.filter(o => o.status === 'preparado').length);
+const completedCount = computed(() => orders.value.filter(o => o.status === 'recogido').length);
 
 // Pedidos filtrados
 const filteredOrders = computed(() => {
@@ -353,8 +363,8 @@ const updateStatus = async (orderId: string, newStatus: string) => {
 
 // Ver comprobante
 const viewProof = (order: Order) => {
-  if (order.proof && order.id) {
-    const url = getFileUrl(order, order.proof as string);
+  if (order.payment_proof && order.id) {
+    const url = getFileUrl(order, order.payment_proof as string);
     window.open(url, '_blank');
   }
 };
