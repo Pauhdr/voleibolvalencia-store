@@ -9,6 +9,7 @@ export interface Product {
   image_path?: string;     // Path del archivo en Supabase Storage
   options: ProductOptions;
   category?: string;
+  size_chart?: SizeChart;  // Tabla de tallas personalizada (opcional)
 }
 
 export interface ProductOptions {
@@ -20,6 +21,35 @@ export interface ProductOptions {
   tallas?: string[];
   generos?: string[];
   colores?: string[];
+}
+
+// Interfaz para la tabla de tallas
+export interface SizeChart {
+  enabled: boolean;                    // Si está habilitada para este producto
+  unit: 'cm' | 'inches';              // Unidad de medida
+  hasSeparateGenders: boolean;        // Si tiene tablas separadas para chico/chica
+  // Tabla única (si hasSeparateGenders = false)
+  columns?: SizeChartColumn[];        // Columnas de medidas (ej: Pecho, Cintura, Largo)
+  rows?: SizeChartRow[];              // Filas con tallas y medidas
+  // Tablas separadas por género (si hasSeparateGenders = true)
+  boys?: {
+    columns: SizeChartColumn[];
+    rows: SizeChartRow[];
+  };
+  girls?: {
+    columns: SizeChartColumn[];
+    rows: SizeChartRow[];
+  };
+}
+
+export interface SizeChartColumn {
+  id: string;                         // ID único de la columna
+  name: string;                       // Nombre de la medida (ej: "Pecho", "Cintura", "Largo")
+}
+
+export interface SizeChartRow {
+  size: string;                       // Talla (ej: "S", "M", "L", "XL")
+  measurements: Record<string, string>; // Objeto con medidas { columnId: valor }
 }
 
 export interface CartItem {
@@ -64,7 +94,7 @@ export interface Order {
 export type OrderStatus = 
   | 'en_revision'        // Estado inicial - pendiente de revisar comprobante
   | 'revisado'           // Pago verificado y aprobado
-  | 'pedido_realizado'   // Pedido confirmado al proveedor
+  | 'pedido'             // Pedido confirmado al proveedor
   | 'preparado'          // Listo para recoger en el club
   | 'recogido'           // Cliente ha recogido el pedido (final)
   | 'cancelado';         // Pedido cancelado
@@ -73,7 +103,7 @@ export type OrderStatus =
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   en_revision: '🔍 En Revisión',
   revisado: '✅ Revisado',
-  pedido_realizado: '📦 Pedido Realizado',
+  pedido: '📦 Pedido Realizado',
   preparado: '🎽 Preparado para Recoger',
   recogido: '✔️ Recogido',
   cancelado: '❌ Cancelado',
@@ -83,7 +113,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   en_revision: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   revisado: 'bg-blue-100 text-blue-800 border-blue-200',
-  pedido_realizado: 'bg-purple-100 text-purple-800 border-purple-200',
+  pedido: 'bg-purple-100 text-purple-800 border-purple-200',
   preparado: 'bg-green-100 text-green-800 border-green-200',
   recogido: 'bg-gray-100 text-gray-800 border-gray-200',
   cancelado: 'bg-red-100 text-red-800 border-red-200',

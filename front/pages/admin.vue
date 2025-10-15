@@ -115,25 +115,11 @@
           <div class="card p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm text-gray-600 mb-1">Total Pedidos</p>
-                <p class="text-3xl font-bold text-gray-900">{{ orders.length }}</p>
-              </div>
-              <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div class="card p-6">
-            <div class="flex items-center justify-between">
-              <div>
                 <p class="text-sm text-gray-600 mb-1">Pendientes</p>
-                <p class="text-3xl font-bold text-yellow-600">{{ pendingCount }}</p>
+                <p class="text-3xl font-bold text-gray-600">{{ pendingCount }}</p>
               </div>
-              <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -144,11 +130,25 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 mb-1">Revisados</p>
-                <p class="text-3xl font-bold text-blue-600">{{ reviewedCount }}</p>
+                <p class="text-3xl font-bold text-yellow-600">{{ reviewedCount }}</p>
+              </div>
+              <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600 mb-1">Preparados</p>
+                <p class="text-3xl font-bold text-blue-600">{{ preparedCount }}</p>
               </div>
               <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
             </div>
@@ -176,9 +176,12 @@
               <label class="text-sm font-semibold text-gray-700 mr-2">Filtrar por estado:</label>
               <select v-model="filterStatus" class="select-field w-auto">
                 <option value="">Todos</option>
-                <option value="pendiente">Pendientes</option>
-                <option value="revisado">Revisados</option>
-                <option value="entregado">Entregados</option>
+                <option value="en_revision">En Revisión</option>
+                <option value="revisado">Revisado</option>
+                <option value="pedido">Pedido Realizado</option>
+                <option value="preparado">Preparado</option>
+                <option value="recogido">Recogido</option>
+                <option value="cancelado">Cancelado</option>
               </select>
             </div>
             <button @click="loadOrders" class="btn-outline flex items-center gap-2">
@@ -252,14 +255,20 @@
                     @click.stop
                     class="select-field text-sm py-1.5 w-full"
                     :class="{
-                      'bg-yellow-50 border-yellow-300 text-yellow-800': order.status === 'pendiente',
+                      'bg-yellow-50 border-yellow-300 text-yellow-800': order.status === 'en_revision',
                       'bg-blue-50 border-blue-300 text-blue-800': order.status === 'revisado',
-                      'bg-green-50 border-green-300 text-green-800': order.status === 'entregado'
+                      'bg-purple-50 border-purple-300 text-purple-800': order.status === 'pedido',
+                      'bg-green-50 border-green-300 text-green-800': order.status === 'preparado',
+                      'bg-gray-50 border-gray-300 text-gray-800': order.status === 'recogido',
+                      'bg-red-50 border-red-300 text-red-800': order.status === 'cancelado'
                     }"
                   >
-                    <option value="pendiente">Pendiente</option>
+                    <option value="en_revision">En Revisión</option>
                     <option value="revisado">Revisado</option>
-                    <option value="entregado">Entregado</option>
+                    <option value="pedido">Pedido Realizado</option>
+                    <option value="preparado">Preparado</option>
+                    <option value="recogido">Recogido</option>
+                    <option value="cancelado">Cancelado</option>
                   </select>
                 </div>
               </div>
@@ -683,6 +692,254 @@
               </div>
             </div>
 
+            <!-- Tabla de Tallas -->
+            <div class="space-y-4 border-t pt-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">Tabla de Tallas</h3>
+                  <p class="text-sm text-gray-600">Define las medidas específicas para cada talla de este producto</p>
+                </div>
+                <label class="flex items-center space-x-3">
+                  <input
+                    v-model="productForm.size_chart.enabled"
+                    type="checkbox"
+                    class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                  />
+                  <span class="font-semibold text-gray-900">Habilitar tabla</span>
+                </label>
+              </div>
+
+              <div v-if="productForm.size_chart.enabled" class="space-y-4">
+                <!-- Selector de unidad -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Unidad de medida
+                  </label>
+                  <div class="flex gap-4">
+                    <label class="flex items-center space-x-2">
+                      <input
+                        v-model="productForm.size_chart.unit"
+                        type="radio"
+                        value="cm"
+                        class="w-4 h-4 text-orange-600"
+                      />
+                      <span>Centímetros (cm)</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                      <input
+                        v-model="productForm.size_chart.unit"
+                        type="radio"
+                        value="inches"
+                        class="w-4 h-4 text-orange-600"
+                      />
+                      <span>Pulgadas (inches)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Selector de tipo de tabla -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Tipo de tabla
+                  </label>
+                  <div class="flex gap-4">
+                    <label class="flex items-center space-x-2">
+                      <input
+                        v-model="productForm.size_chart.hasSeparateGenders"
+                        type="radio"
+                        :value="false"
+                        class="w-4 h-4 text-orange-600"
+                      />
+                      <span>Tabla única (unisex)</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                      <input
+                        v-model="productForm.size_chart.hasSeparateGenders"
+                        type="radio"
+                        :value="true"
+                        class="w-4 h-4 text-orange-600"
+                      />
+                      <span>Tablas separadas (chico/chica)</span>
+                    </label>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">
+                    {{ productForm.size_chart.hasSeparateGenders 
+                      ? 'Podrás definir medidas diferentes para chicos y chicas' 
+                      : 'Una sola tabla de tallas para ambos géneros' }}
+                  </p>
+                </div>
+
+                <!-- TABLA ÚNICA (unisex) -->
+                <div v-if="!productForm.size_chart.hasSeparateGenders">
+                <!-- Gestión de columnas (medidas) -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-semibold text-gray-900">Medidas (Columnas)</h4>
+                    <button
+                      type="button"
+                      @click="addSizeChartColumn"
+                      class="btn-outline text-sm flex items-center gap-1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Añadir medida
+                    </button>
+                  </div>
+                  
+                  <div v-if="productForm.size_chart.columns.length > 0" class="space-y-2">
+                    <div
+                      v-for="(column, index) in productForm.size_chart.columns"
+                      :key="column.id"
+                      class="flex items-center gap-2"
+                    >
+                      <input
+                        v-model="column.name"
+                        type="text"
+                        class="input-field flex-1"
+                        placeholder="Ej: Pecho, Cintura, Largo..."
+                      />
+                      <button
+                        type="button"
+                        @click="removeSizeChartColumn(index)"
+                        class="text-red-600 hover:text-red-800 p-2"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <p v-else class="text-sm text-gray-500 text-center py-2">
+                    No hay medidas definidas. Haz clic en "Añadir medida" para empezar.
+                  </p>
+                </div>
+
+                <!-- Gestión de tallas y medidas -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-semibold text-gray-900">Tallas y Medidas</h4>
+                    <button
+                      type="button"
+                      @click="addSizeChartRow"
+                      class="btn-outline text-sm flex items-center gap-1"
+                      :disabled="productForm.size_chart.columns.length === 0"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Añadir talla
+                    </button>
+                  </div>
+
+                  <div v-if="productForm.size_chart.columns.length === 0" class="text-sm text-gray-500 text-center py-4">
+                    Primero define las medidas (columnas) antes de añadir tallas
+                  </div>
+
+                  <div v-else-if="productForm.size_chart.rows.length > 0" class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                      <thead class="bg-gray-100">
+                        <tr>
+                          <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Talla</th>
+                          <th
+                            v-for="column in productForm.size_chart.columns"
+                            :key="column.id"
+                            class="px-4 py-2 text-left text-sm font-semibold text-gray-700"
+                          >
+                            {{ column.name }}
+                          </th>
+                          <th class="px-4 py-2 w-20"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(row, rowIndex) in productForm.size_chart.rows"
+                          :key="rowIndex"
+                          class="border-t border-gray-200"
+                        >
+                          <td class="px-4 py-2">
+                            <input
+                              v-model="row.size"
+                              type="text"
+                              class="input-field"
+                              placeholder="S, M, L..."
+                            />
+                          </td>
+                          <td
+                            v-for="column in productForm.size_chart.columns"
+                            :key="column.id"
+                            class="px-4 py-2"
+                          >
+                            <input
+                              v-model="row.measurements[column.id]"
+                              type="text"
+                              class="input-field"
+                              :placeholder="`Ej: 45-48`"
+                            />
+                          </td>
+                          <td class="px-4 py-2 text-center">
+                            <button
+                              type="button"
+                              @click="removeSizeChartRow(rowIndex)"
+                              class="text-red-600 hover:text-red-800"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div v-else class="text-sm text-gray-500 text-center py-2">
+                    No hay tallas definidas. Haz clic en "Añadir talla" para empezar.
+                  </div>
+                </div>
+
+                <!-- Preview de la tabla -->
+                <div v-if="productForm.size_chart.rows.length > 0" class="bg-blue-50 p-4 rounded-lg">
+                  <h4 class="font-semibold text-blue-900 mb-2">📏 Vista previa de la tabla</h4>
+                  <p class="text-sm text-blue-700 mb-3">Esta tabla se mostrará a los clientes en la página del producto</p>
+                  <div class="bg-white p-3 rounded border border-blue-200 overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                      <thead>
+                        <tr class="border-b-2 border-gray-300">
+                          <th class="px-3 py-2 text-left font-bold">Talla</th>
+                          <th
+                            v-for="column in productForm.size_chart.columns"
+                            :key="column.id"
+                            class="px-3 py-2 text-left font-bold"
+                          >
+                            {{ column.name }} ({{ productForm.size_chart.unit }})
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="row in productForm.size_chart.rows"
+                          :key="row.size"
+                          class="border-b border-gray-200"
+                        >
+                          <td class="px-3 py-2 font-semibold">{{ row.size }}</td>
+                          <td
+                            v-for="column in productForm.size_chart.columns"
+                            :key="column.id"
+                            class="px-3 py-2"
+                          >
+                            {{ row.measurements[column.id] || '-' }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                </div>
+                <!-- FIN TABLA ÚNICA -->
+              </div>
+            </div>
+
             <!-- Botones del formulario -->
             <div class="flex gap-3 pt-4 border-t">
               <button
@@ -713,6 +970,11 @@ import { ref, computed, onMounted } from 'vue';
 import { useSupabase } from '~/composables/useSupabase';
 import type { Order, OrderStatus, Product } from '~/types';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '~/types';
+
+// Usar layout específico para admin (sin navegación ni footer)
+definePageMeta({
+  layout: 'admin'
+});
 
 const { loginAdmin, logoutAdmin, getOrders, updateOrderStatus, getFileUrl, getProducts, createProduct, updateProduct, deleteProduct, uploadProductImage } = useSupabase();
 
@@ -762,12 +1024,28 @@ const productForm = ref({
     tallas: [] as string[],
     generos: [] as string[],
   },
+  size_chart: {
+    enabled: false,
+    unit: 'cm' as 'cm' | 'inches',
+    hasSeparateGenders: false,
+    columns: [] as Array<{ id: string; name: string }>,
+    rows: [] as Array<{ size: string; measurements: Record<string, string> }>,
+    boys: {
+      columns: [] as Array<{ id: string; name: string }>,
+      rows: [] as Array<{ size: string; measurements: Record<string, string> }>,
+    },
+    girls: {
+      columns: [] as Array<{ id: string; name: string }>,
+      rows: [] as Array<{ size: string; measurements: Record<string, string> }>,
+    },
+  },
 });
 
 // Contadores de pedidos por estado
-const pendingCount = computed(() => orders.value.filter(o => o.status === 'pendiente').length);
+const pendingCount = computed(() => orders.value.filter(o => o.status === 'en_revision').length);
 const reviewedCount = computed(() => orders.value.filter(o => o.status === 'revisado').length);
-const deliveredCount = computed(() => orders.value.filter(o => o.status === 'entregado').length);
+const preparedCount = computed(() => orders.value.filter(o => o.status === 'preparado').length);
+const deliveredCount = computed(() => orders.value.filter(o => o.status === 'recogido').length);
 
 // Pedidos filtrados
 const filteredOrders = computed(() => {
@@ -883,6 +1161,12 @@ const openProductModal = (product?: Product) => {
         tallas: product.options?.tallas || [],
         generos: product.options?.generos || [],
       },
+      size_chart: product.size_chart || {
+        enabled: false,
+        unit: 'cm',
+        columns: [],
+        rows: [],
+      },
     };
     imagePreview.value = product.image || '';
   } else {
@@ -919,6 +1203,12 @@ const resetProductForm = () => {
       tallas: [],
       generos: [],
     },
+    size_chart: {
+      enabled: false,
+      unit: 'cm',
+      columns: [],
+      rows: [],
+    },
   };
 };
 
@@ -951,6 +1241,49 @@ const handleImageUpload = (event: Event) => {
   }
 };
 
+// ============ FUNCIONES DE TABLA DE TALLAS ============
+
+// Añadir columna (medida) a la tabla de tallas
+const addSizeChartColumn = () => {
+  const columnId = `col_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  productForm.value.size_chart.columns.push({
+    id: columnId,
+    name: '',
+  });
+};
+
+// Eliminar columna de la tabla de tallas
+const removeSizeChartColumn = (index: number) => {
+  const columnId = productForm.value.size_chart.columns[index].id;
+  productForm.value.size_chart.columns.splice(index, 1);
+  
+  // Eliminar las medidas de esta columna en todas las filas
+  productForm.value.size_chart.rows.forEach(row => {
+    delete row.measurements[columnId];
+  });
+};
+
+// Añadir fila (talla) a la tabla de tallas
+const addSizeChartRow = () => {
+  const measurements: Record<string, string> = {};
+  // Inicializar medidas vacías para cada columna
+  productForm.value.size_chart.columns.forEach(column => {
+    measurements[column.id] = '';
+  });
+  
+  productForm.value.size_chart.rows.push({
+    size: '',
+    measurements,
+  });
+};
+
+// Eliminar fila de la tabla de tallas
+const removeSizeChartRow = (index: number) => {
+  productForm.value.size_chart.rows.splice(index, 1);
+};
+
+// ============ FIN FUNCIONES DE TABLA DE TALLAS ============
+
 // Guardar producto (crear o actualizar)
 const saveProduct = async () => {
   savingProduct.value = true;
@@ -970,6 +1303,7 @@ const saveProduct = async () => {
         tallas: productForm.value.options.hasTalla ? productForm.value.options.tallas : [],
         generos: productForm.value.options.hasGenero ? productForm.value.options.generos : [],
       },
+      size_chart: productForm.value.size_chart.enabled ? productForm.value.size_chart : null,
     };
 
     // Si hay una imagen nueva seleccionada, subirla primero

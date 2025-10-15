@@ -34,6 +34,8 @@ export const useSupabase = () => {
           description: record.description || '',
           options: record.options || {},
           category: record.category,
+          image_path: record.image_path || '',
+          size_chart: record.size_chart || undefined,
         }
         
         // Obtener URL pública de la imagen si existe
@@ -78,6 +80,8 @@ export const useSupabase = () => {
         description: data.description || '',
         options: data.options || {},
         category: data.category,
+        image_path: data.image_path || '',
+        size_chart: data.size_chart || undefined,
       }
       
       // Obtener URL pública de la imagen si existe

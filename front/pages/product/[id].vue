@@ -25,11 +25,11 @@
         <span class="text-gray-900 font-medium">{{ product.name }}</span>
       </nav>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 h-full">
         <!-- Columna izquierda - Imagen -->
         <div class="space-y-6">
-          <div class="card overflow-hidden">
-            <div class="aspect-square bg-gray-100 flex items-center justify-center">
+          <div class="card overflow-hidden justify-center max-w-[600px] max-h-[600px] mx-auto">
+            <div class="aspect-square bg-gray-100 flex items-center ">
               <img
                 v-if="product.image"
                 :src="product.image"
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Columna derecha - Información y configuración -->
-        <div class="space-y-6">
+        <div class="space-y-6 h-full flex flex-col justify-between">
           <!-- Título y precio -->
           <div>
             <h1 class="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-3">
@@ -76,7 +76,7 @@
           </div>
 
           <!-- Información adicional -->
-          <div class="border-t border-gray-200 pt-6 space-y-4">
+          <!-- <div class="border-t border-gray-200 pt-6 space-y-4">
             <div class="flex items-start">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -96,7 +96,7 @@
               </div>
             </div>
             
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -104,6 +104,7 @@
     <!-- Modal de guía de tallas -->
     <SizeGuideModal
       :is-open="showSizeGuide"
+      :size-chart="product?.size_chart"
       @close="showSizeGuide = false"
     />
   </div>

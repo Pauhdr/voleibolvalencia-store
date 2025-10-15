@@ -95,7 +95,7 @@ En el mismo SQL Editor, crea una **nueva query** y pega:
 CREATE TYPE order_status AS ENUM (
   'en_revision',
   'revisado',
-  'pedido_realizado',
+  'pedido',
   'preparado',
   'recogido',
   'cancelado'

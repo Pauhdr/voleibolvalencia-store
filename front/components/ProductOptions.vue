@@ -133,8 +133,7 @@
       :disabled="!isValid"
       class="btn-primary w-full mt-4"
     >
-      <span v-if="isValid">Añadir al carrito</span>
-      <span v-else>Completa las opciones requeridas</span>
+      <span>Añadir al carrito</span>
     </button>
 
     <!-- Mensaje de error -->
@@ -220,7 +219,5 @@ const addToCart = () => {
   quantity.value = 1;
   errorMessage.value = '';
 
-  // Mostrar feedback
-  alert('Producto añadido al carrito');
 };
 </script>

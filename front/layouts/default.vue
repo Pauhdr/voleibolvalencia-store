@@ -59,7 +59,7 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-8 mt-12">
       <div class="container-custom">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="flex align-center justify-around gap-8">
           <!-- Info del club -->
           <div>
             <h3 class="font-display font-bold text-lg mb-3">Voleibol Valencia</h3>
