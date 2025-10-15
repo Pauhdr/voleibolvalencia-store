@@ -505,6 +505,27 @@ const handleSubmit = async () => {
     const order = await createOrder(orderData);
 
     if (order) {
+      // Guardar datos del pedido en localStorage para la página de éxito
+      const orderForReceipt = {
+        buyer: {
+          player_name: formData.value.player_name,
+          team: formData.value.team,
+          parent_name: formData.value.parent_name,
+          email: formData.value.email,
+        },
+        items: cartStore.items.map(item => ({
+          product_id: item.product_id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          options: item.options,
+        })),
+        total: cartStore.total,
+        date: new Date().toISOString(),
+        orderNumber: order.id,
+      };
+      localStorage.setItem('lastOrder', JSON.stringify(orderForReceipt));
+      
       // Limpiar carrito y redirigir a página de éxito
       cartStore.reset();
       router.push('/success');
