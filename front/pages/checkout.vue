@@ -233,7 +233,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '~/stores/cart';
-import { usePocketBase } from '~/composables/usePocketBase';
+import { useSupabase } from '~/composables/useSupabase';
 import type { BuyerData } from '~/types';
 
 const TEAMS = [
@@ -255,7 +255,7 @@ const TEAMS = [
 
 const router = useRouter();
 const cartStore = useCartStore();
-const { createOrder } = usePocketBase();
+const { createOrder } = useSupabase();
 
 // Redirigir si el carrito está vacío
 if (cartStore.isEmpty) {

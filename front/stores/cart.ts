@@ -56,8 +56,7 @@ export const useCartStore = defineStore('cart', {
         // Si no existe, añadir nuevo item
         this.items.push({ ...item });
       }
-
-      this.saveToLocalStorage();
+      // No necesitamos saveToLocalStorage() - el plugin lo hace automáticamente
     },
 
     // Actualizar cantidad de un item
@@ -66,74 +65,44 @@ export const useCartStore = defineStore('cart', {
         this.removeItem(index);
       } else {
         this.items[index].quantity = quantity;
-        this.saveToLocalStorage();
+        // No necesitamos saveToLocalStorage() - el plugin lo hace automáticamente
       }
     },
 
     // Eliminar item del carrito
     removeItem(index: number) {
       this.items.splice(index, 1);
-      this.saveToLocalStorage();
+      // No necesitamos saveToLocalStorage() - el plugin lo hace automáticamente
     },
 
     // Limpiar todo el carrito
     clearCart() {
       this.items = [];
-      this.saveToLocalStorage();
+      // No necesitamos saveToLocalStorage() - el plugin lo hace automáticamente
     },
 
     // Guardar datos del comprador
     setBuyerData(data: BuyerData) {
       this.buyerData = data;
-      this.saveToLocalStorage();
+      // No necesitamos saveToLocalStorage() - el plugin lo hace automáticamente
     },
 
     // Limpiar datos del comprador
     clearBuyerData() {
       this.buyerData = null;
-      this.saveToLocalStorage();
-    },
-
-    // Guardar en localStorage
-    saveToLocalStorage() {
-      if (process.client) {
-        localStorage.setItem('cart', JSON.stringify(this.items));
-        localStorage.setItem('buyerData', JSON.stringify(this.buyerData));
-      }
-    },
-
-    // Cargar desde localStorage
-    loadFromLocalStorage() {
-      if (process.client) {
-        const cartData = localStorage.getItem('cart');
-        const buyerData = localStorage.getItem('buyerData');
-
-        if (cartData) {
-          try {
-            this.items = JSON.parse(cartData);
-          } catch (e) {
-            console.error('Error parsing cart data:', e);
-          }
-        }
-
-        if (buyerData) {
-          try {
-            this.buyerData = JSON.parse(buyerData);
-          } catch (e) {
-            console.error('Error parsing buyer data:', e);
-          }
-        }
-      }
+      // No necesitamos saveToLocalStorage() - el plugin lo hace automáticamente
     },
 
     // Resetear todo (después de completar pedido)
     reset() {
       this.items = [];
       this.buyerData = null;
-      if (process.client) {
-        localStorage.removeItem('cart');
-        localStorage.removeItem('buyerData');
-      }
+      // El plugin maneja la sincronización con localStorage automáticamente
     },
+  },
+
+  // Configuración de persistencia automática
+  persist: {
+    storage: process.client ? localStorage : undefined,
   },
 });

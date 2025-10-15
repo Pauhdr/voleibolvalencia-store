@@ -113,11 +113,11 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Product } from '~/types';
-import { usePocketBase } from '~/composables/usePocketBase';
+import { useSupabase } from '~/composables/useSupabase';
 
 const route = useRoute();
 const router = useRouter();
-const { getProductById } = usePocketBase();
+const { getProductById } = useSupabase();
 
 const product = ref<Product | null>(null);
 const loading = ref(true);

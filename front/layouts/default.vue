@@ -42,8 +42,8 @@
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                 />
               </svg>
-              <span v-if="cartStore.itemCount > 0" class="absolute -top-2 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                {{ cartStore.itemCount }}
+              <span v-if="itemCount > 0" class="absolute -top-2 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {{ itemCount }}
               </span>
             </NuxtLink>
           </div>
@@ -101,11 +101,19 @@
 
 <script setup lang="ts">
 import { useCartStore } from '~/stores/cart';
+import { ref, onMounted } from 'vue';
 
-const cartStore = useCartStore();
+// Inicializar el contador como 0
+const itemCount = ref(0);
 
-// Cargar datos del carrito desde localStorage al montar
+// Solo inicializar el store en el cliente después de montar
 onMounted(() => {
-  cartStore.loadFromLocalStorage();
+  const cartStore = useCartStore();
+  // Actualizar el itemCount de forma reactiva
+  watch(() => cartStore.itemCount, (newCount) => {
+    itemCount.value = newCount;
+  }, { immediate: true });
 });
+
+// El plugin de persistedstate ya maneja la carga automática desde localStorage
 </script>

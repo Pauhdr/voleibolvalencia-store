@@ -279,11 +279,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { usePocketBase } from '~/composables/usePocketBase';
+import { useSupabase } from '~/composables/useSupabase';
 import type { Order, OrderStatus } from '~/types';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '~/types';
 
-const { loginAdmin, logoutAdmin, isAuthenticated, getOrders, updateOrderStatus, getFileUrl } = usePocketBase();
+const { loginAdmin, logoutAdmin, isAuthenticated, getOrders, updateOrderStatus, getFileUrl } = useSupabase();
 
 // Estado de autenticación
 const loginForm = ref({

@@ -1,6 +1,6 @@
 <template>
   <div class="container-custom py-16">
-    <div class="max-w-2xl mx-auto text-center">
+    <div class="max-w-2xl mx-auto text-center h-[100vh] ">
       <!-- Icono de éxito -->
       <div class="mb-8">
         <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -17,14 +17,14 @@
       </div>
 
       <!-- Información del pedido -->
-      <div class="card p-8 mb-8 text-left">
-        <h2 class="text-2xl font-display font-bold text-gray-900 mb-6 text-center">
+      <!-- <div class="card p-8 mb-8 text-left"> -->
+        <!-- <h2 class="text-2xl font-display font-bold text-gray-900 mb-6 text-center">
           Próximos Pasos
-        </h2>
+        </h2> -->
 
-        <div class="space-y-6">
+        <!-- <div class="space-y-6"> -->
           <!-- Paso 1 -->
-          <div class="flex items-start space-x-4">
+          <!-- <div class="flex items-start space-x-4">
             <div class="flex-shrink-0 w-10 h-10 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold">
               1
             </div>
@@ -34,10 +34,10 @@
                 El club revisará tu pedido y el comprobante de pago en las próximas 24-48 horas.
               </p>
             </div>
-          </div>
+          </div> -->
 
           <!-- Paso 2 -->
-          <div class="flex items-start space-x-4">
+          <!-- <div class="flex items-start space-x-4">
             <div class="flex-shrink-0 w-10 h-10 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold">
               2
             </div>
@@ -47,10 +47,10 @@
                 Recibirás un email de confirmación cuando el pago haya sido verificado.
               </p>
             </div>
-          </div>
+          </div> -->
 
           <!-- Paso 3 -->
-          <div class="flex items-start space-x-4">
+          <!-- <div class="flex items-start space-x-4">
             <div class="flex-shrink-0 w-10 h-10 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold">
               3
             </div>
@@ -60,12 +60,12 @@
                 Te avisaremos cuando el pedido esté listo para recoger en el club.
               </p>
             </div>
-          </div>
-        </div>
-      </div>
+          </div> -->
+        <!-- </div> -->
+      <!-- </div> -->
 
       <!-- Datos bancarios de recordatorio -->
-      <div class="card p-6 bg-orange-50 border-2 border-orange-200 mb-8 text-left">
+      <!-- <div class="card p-6 bg-orange-50 border-2 border-orange-200 mb-8 text-left">
         <h3 class="text-lg font-display font-bold text-gray-900 mb-4 text-center">
           📋 Recordatorio: Datos de Transferencia
         </h3>
@@ -81,7 +81,7 @@
             <p class="font-bold text-gray-900">Club Voleibol Valencia</p>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Información de contacto -->
       <div class="bg-gray-50 rounded-lg p-6 mb-8">

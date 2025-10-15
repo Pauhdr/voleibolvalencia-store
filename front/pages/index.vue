@@ -46,9 +46,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import type { Product } from '~/types';
-import { usePocketBase } from '~/composables/usePocketBase';
+import { useSupabase } from '~/composables/useSupabase';
 
-const { getProducts } = usePocketBase();
+const { getProducts } = useSupabase();
 
 const products = ref<Product[]>([]);
 const loading = ref(true);
@@ -59,7 +59,6 @@ const loadProducts = async () => {
   error.value = '';
   
   try {
-    // Si no hay conexión a PocketBase, usar productos de ejemplo
     const fetchedProducts = await getProducts();
     
     if (fetchedProducts.length === 0) {
