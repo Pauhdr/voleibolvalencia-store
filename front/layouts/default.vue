@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50">
+  <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
+    <header class="bg-white sticky top-0 z-50">
       <nav class="container-custom py-4">
         <div class="flex items-center justify-between">
           <!-- Logo y título -->

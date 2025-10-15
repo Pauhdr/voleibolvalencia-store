@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply font-sans bg-gray-50 text-gray-900;
+    @apply font-sans bg-white text-gray-900;
   }
 }
 
@@ -19,16 +19,16 @@
   }
   
   .btn-outline {
-    @apply border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
+    @apply border-2 border-zinc-900 text-zinc-900 font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
   }
   
   /* Input fields */
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all;
+    @apply w-full bg-gray-200 px-4 py-2 rounded-lg focus:border-transparent outline-none transition-all;
   }
   
   .select-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-white cursor-pointer;
+    @apply w-full px-4 py-2 rounded-lg  focus:border-transparent outline-none transition-all bg-white cursor-pointer;
   }
   
   /* Cards */

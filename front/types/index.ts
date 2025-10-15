@@ -120,15 +120,16 @@ export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
 };
 
 export const TEAMS = [
-  'Benjamín Mixto',
-  'Alevín Femenino',
-  'Alevín Masculino',
+  'Benjamín',
+  'Alevín',
   'Infantil Femenino',
   'Infantil Masculino',
   'Cadete Femenino',
   'Cadete Masculino',
   'Juvenil Femenino',
   'Juvenil Masculino',
+  'Junior Femenino',
+  'Junior Masculino',
   'Senior Femenino',
   'Senior Masculino',
 ] as const;
