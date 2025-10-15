@@ -64,17 +64,53 @@
             <h1 class="text-2xl font-display font-bold text-gray-900">
               Panel de Administración
             </h1>
-            <p class="text-sm text-gray-600">Gestión de pedidos del club</p>
+            <p class="text-sm text-gray-600">Gestión del club</p>
           </div>
           <button @click="handleLogout" class="btn-secondary">
             Cerrar Sesión
           </button>
         </div>
+        
+        <!-- Pestañas -->
+        <div class="container-custom mt-4">
+          <div class="flex border-b border-gray-200">
+            <button
+              @click="activeTab = 'orders'"
+              :class="[
+                'px-6 py-3 font-semibold transition-colors border-b-2 flex items-center gap-2',
+                activeTab === 'orders'
+                  ? 'border-orange-600 text-orange-600'
+                  : 'border-transparent text-gray-600 hover:text-orange-600'
+              ]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              Pedidos
+            </button>
+            <button
+              @click="activeTab = 'products'"
+              :class="[
+                'px-6 py-3 font-semibold transition-colors border-b-2 flex items-center gap-2',
+                activeTab === 'products'
+                  ? 'border-orange-600 text-orange-600'
+                  : 'border-transparent text-gray-600 hover:text-orange-600'
+              ]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              Productos
+            </button>
+          </div>
+        </div>
       </header>
 
       <!-- Contenido principal -->
       <main class="container-custom py-8">
-        <!-- Estadísticas -->
+        <!-- TAB: PEDIDOS -->
+        <div v-if="activeTab === 'orders'">
+          <!-- Estadísticas -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div class="card p-6">
             <div class="flex items-center justify-between">
@@ -145,8 +181,11 @@
                 <option value="entregado">Entregados</option>
               </select>
             </div>
-            <button @click="loadOrders" class="btn-outline">
-              🔄 Actualizar
+            <button @click="loadOrders" class="btn-outline flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Actualizar
             </button>
           </div>
         </div>
@@ -158,110 +197,175 @@
         </div>
 
         <!-- Lista de pedidos -->
-        <div v-else-if="filteredOrders.length > 0" class="space-y-4">
+        <div v-else-if="filteredOrders.length > 0" class="space-y-3">
           <div
             v-for="order in filteredOrders"
             :key="order.id"
-            class="card p-6"
+            class="card overflow-hidden"
           >
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <!-- Información del pedido -->
-              <div class="lg:col-span-3">
-                <div class="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-1">
-                      {{ order.player_name }}
-                    </h3>
-                    <p class="text-gray-600">{{ order.team }}</p>
-                  </div>
-                  <span
-                    :class="[
-                      'px-3 py-1 rounded-full text-sm font-semibold',
-                      order.status === 'pendiente' ? 'bg-yellow-100 text-yellow-800' :
-                      order.status === 'revisado' ? 'bg-blue-100 text-blue-800' :
-                      'bg-green-100 text-green-800'
-                    ]"
+            <!-- Fila principal (siempre visible) -->
+            <div 
+              class="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
+              @click="toggleOrderDetails(order.id!)"
+            >
+              <!-- Botón expandir/colapsar -->
+              <button class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  class="h-5 w-5 transition-transform duration-200"
+                  :class="{ 'rotate-90': expandedOrders.includes(order.id!) }"
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <!-- Información principal -->
+              <div class="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                <!-- Nombre jugador -->
+                <div class="min-w-0">
+                  <p class="font-semibold text-gray-900 truncate">{{ order.player_name }}</p>
+                  <p class="text-sm text-gray-500 truncate">{{ order.team }}</p>
+                </div>
+
+                <!-- Email -->
+                <div class="min-w-0">
+                  <p class="text-sm text-gray-600 truncate">{{ order.email }}</p>
+                  <p class="text-xs text-gray-400">
+                    {{ order.created ? new Date(order.created).toLocaleDateString('es-ES') : 'N/A' }}
+                  </p>
+                </div>
+
+                <!-- Total -->
+                <div class="min-w-0">
+                  <p class="font-bold text-orange-600">{{ order.total?.toFixed(2) }}€</p>
+                  <p class="text-xs text-gray-500">{{ order.items?.length || 0 }} producto(s)</p>
+                </div>
+
+                <!-- Estado (selector) -->
+                <div class="min-w-0 flex items-center gap-2">
+                  <select
+                    :value="order.status"
+                    @change="updateStatus(order.id!, ($event.target as HTMLSelectElement).value)"
+                    @click.stop
+                    class="select-field text-sm py-1.5 w-full"
+                    :class="{
+                      'bg-yellow-50 border-yellow-300 text-yellow-800': order.status === 'pendiente',
+                      'bg-blue-50 border-blue-300 text-blue-800': order.status === 'revisado',
+                      'bg-green-50 border-green-300 text-green-800': order.status === 'entregado'
+                    }"
                   >
-                    {{ order.status }}
-                  </span>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="revisado">Revisado</option>
+                    <option value="entregado">Entregado</option>
+                  </select>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <p class="text-sm text-gray-600">Jugador/a</p>
-                    <p class="font-semibold text-gray-900">{{ order.player_name }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-600">Equipo</p>
-                    <p class="font-semibold text-gray-900">{{ order.team }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-600">Padre/Madre</p>
-                    <p class="font-semibold text-gray-900">{{ order.parent_name }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-600">Email</p>
-                    <p class="font-semibold text-gray-900">{{ order.email }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-600">Total</p>
-                    <p class="font-bold text-orange-600 text-lg">{{ order.total?.toFixed(2) }}€</p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-600">Fecha</p>
-                    <p class="font-semibold text-gray-900">
-                      {{ order.created ? new Date(order.created).toLocaleDateString('es-ES') : 'N/A' }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Productos -->
-                <div class="bg-gray-50 p-4 rounded-lg">
-                  <p class="text-sm font-semibold text-gray-700 mb-2">Productos:</p>
-                  <ul class="space-y-2">
-                    <li
-                      v-for="(product, index) in order.items"
-                      :key="index"
-                      class="text-sm text-gray-700 flex justify-between"
-                    >
-                      <span>
-                        {{ product.name }} x{{ product.quantity }}
-                        <span v-if="product.options.talla" class="text-gray-500">
-                          ({{ product.options.talla }}
-                          <span v-if="product.options.genero">, {{ product.options.genero }}</span>
-                          <span v-if="product.options.numero">, #{{ product.options.numero }}</span>
-                          <span v-if="product.options.nombre">, {{ product.options.nombre }}</span>)
-                        </span>
-                      </span>
-                      <span class="font-semibold">
-                        {{ (product.price * product.quantity).toFixed(2) }}€
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- Acciones -->
-              <div class="lg:col-span-1 space-y-3">
-                <select
-                  :value="order.status"
-                  @change="updateStatus(order.id!, ($event.target as HTMLSelectElement).value)"
-                  class="select-field w-full"
-                >
-                  <option value="pendiente">Pendiente</option>
-                  <option value="revisado">Revisado</option>
-                  <option value="entregado">Entregado</option>
-                </select>
-
-                <button
-                  v-if="order.proof"
-                  @click="viewProof(order)"
-                  class="btn-outline w-full text-sm"
-                >
-                  📎 Ver Comprobante
-                </button>
               </div>
             </div>
+
+            <!-- Detalles expandibles -->
+            <transition
+              enter-active-class="transition-all duration-200 ease-out"
+              enter-from-class="opacity-0 max-h-0"
+              enter-to-class="opacity-100 max-h-[2000px]"
+              leave-active-class="transition-all duration-200 ease-in"
+              leave-from-class="opacity-100 max-h-[2000px]"
+              leave-to-class="opacity-0 max-h-0"
+            >
+              <div v-if="expandedOrders.includes(order.id!)" class="border-t border-gray-200 bg-gray-50">
+                <div class="p-6 space-y-6">
+                  <!-- Información del pedido -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Jugador/a</p>
+                      <p class="font-semibold text-gray-900">{{ order.player_name }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Equipo</p>
+                      <p class="font-semibold text-gray-900">{{ order.team }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Padre/Madre</p>
+                      <p class="font-semibold text-gray-900">{{ order.parent_name }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Email</p>
+                      <p class="font-semibold text-gray-900">{{ order.email }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Total</p>
+                      <p class="font-bold text-orange-600 text-lg">{{ order.total?.toFixed(2) }}€</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Fecha</p>
+                      <p class="font-semibold text-gray-900">
+                        {{ order.created ? new Date(order.created).toLocaleDateString('es-ES', { 
+                          day: 'numeric', 
+                          month: 'long', 
+                          year: 'numeric' 
+                        }) : 'N/A' }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Productos -->
+                  <div>
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      Productos del pedido
+                    </h4>
+                    <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
+                      <div
+                        v-for="(product, index) in order.items"
+                        :key="index"
+                        class="p-4 hover:bg-gray-50 transition-colors"
+                      >
+                        <div class="flex justify-between items-start gap-4">
+                          <div class="flex-1">
+                            <p class="font-semibold text-gray-900">{{ product.name }}</p>
+                            <div v-if="product.options && Object.keys(product.options).length > 0" class="mt-1 flex flex-wrap gap-2">
+                              <span v-if="product.options.talla" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                Talla: {{ product.options.talla }}
+                              </span>
+                              <span v-if="product.options.genero" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                {{ product.options.genero }}
+                              </span>
+                              <span v-if="product.options.numero" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                #{{ product.options.numero }}
+                              </span>
+                              <span v-if="product.options.nombre" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                {{ product.options.nombre }}
+                              </span>
+                            </div>
+                          </div>
+                          <div class="text-right flex-shrink-0">
+                            <p class="font-semibold text-gray-900">{{ (product.price * product.quantity).toFixed(2) }}€</p>
+                            <p class="text-sm text-gray-500">{{ product.price.toFixed(2) }}€ × {{ product.quantity }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Botón ver comprobante -->
+                  <div v-if="order.proof" class="flex justify-end">
+                    <button
+                      @click="viewProof(order)"
+                      class="btn-outline text-sm flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
+                      Ver Comprobante de Pago
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </transition>
           </div>
         </div>
 
@@ -272,7 +376,334 @@
           </svg>
           <p class="text-gray-600">No hay pedidos que mostrar</p>
         </div>
+        </div>
+        <!-- FIN TAB PEDIDOS -->
+
+        <!-- TAB: PRODUCTOS -->
+        <div v-if="activeTab === 'products'" class="space-y-6">
+          <!-- Botón crear producto -->
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-900">Gestión de Productos</h2>
+            <button @click="openProductModal()" class="btn-primary flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Nuevo Producto
+            </button>
+          </div>
+
+          <!-- Loading productos -->
+          <div v-if="loadingProducts" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            <p class="mt-4 text-gray-600">Cargando productos...</p>
+          </div>
+
+          <!-- Lista de productos -->
+          <div v-else-if="products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div
+              v-for="product in products"
+              :key="product.id"
+              class="card p-6"
+            >
+              <!-- Imagen del producto -->
+              <div class="aspect-square bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                <img
+                  v-if="product.image"
+                  :src="product.image"
+                  :alt="product.name"
+                  class="w-full h-full object-cover"
+                />
+                <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Info del producto -->
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ product.name }}</h3>
+              <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
+              <p class="text-2xl font-bold text-orange-600 mb-4">{{ product.price?.toFixed(2) }}€</p>
+
+              <!-- Opciones disponibles -->
+              <div v-if="product.options" class="bg-gray-50 p-3 rounded mb-4 text-sm">
+                <p class="font-semibold text-gray-700 mb-1">Opciones:</p>
+                <div class="space-y-1 text-gray-600">
+                  <p v-if="product.options.hasTalla">✓ Tallas: {{ product.options.tallas?.join(', ') }}</p>
+                  <p v-if="product.options.hasGenero">✓ Géneros disponibles</p>
+                  <p v-if="product.options.hasNumero">✓ Dorsal personalizable</p>
+                  <p v-if="product.options.hasNombre">✓ Nombre personalizable</p>
+                </div>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="flex gap-2">
+                <button
+                  @click="openProductModal(product)"
+                  class="btn-outline flex-1 text-sm flex items-center justify-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Editar
+                </button>
+                <button
+                  @click="confirmDeleteProduct(product)"
+                  class="btn-outline flex-1 text-sm text-red-600 hover:bg-red-50 flex items-center justify-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- No hay productos -->
+          <div v-else class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <p class="text-gray-600 mb-4">No hay productos creados</p>
+            <button @click="openProductModal()" class="btn-primary flex items-center gap-2 mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Crear primer producto
+            </button>
+          </div>
+        </div>
+        <!-- FIN TAB PRODUCTOS -->
       </main>
+
+      <!-- Modal de Producto -->
+      <div
+        v-if="showProductModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        @click.self="closeProductModal"
+      >
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <!-- Header del modal -->
+          <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-900">
+              {{ editingProduct ? 'Editar Producto' : 'Nuevo Producto' }}
+            </h2>
+            <button @click="closeProductModal" class="text-gray-400 hover:text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Formulario del producto -->
+          <form @submit.prevent="saveProduct" class="p-6 space-y-6">
+            <!-- Información básica -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900">Información Básica</h3>
+              
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Nombre del Producto *
+                </label>
+                <input
+                  v-model="productForm.name"
+                  type="text"
+                  required
+                  class="input-field"
+                  placeholder="Ej: Sudadera Club 40 Aniversario"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Descripción
+                </label>
+                <textarea
+                  v-model="productForm.description"
+                  rows="3"
+                  class="input-field"
+                  placeholder="Descripción del producto..."
+                ></textarea>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Precio (€) *
+                  </label>
+                  <input
+                    v-model.number="productForm.price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    class="input-field"
+                    placeholder="35.00"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Categoría
+                  </label>
+                  <select v-model="productForm.category" class="select-field">
+                    <option value="">Sin categoría</option>
+                    <option value="camisetas">Camisetas</option>
+                    <option value="sudaderas">Sudaderas</option>
+                    <option value="pantalones">Pantalones</option>
+                    <option value="complementos">Complementos</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Imagen del Producto
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="handleImageUpload"
+                  class="input-field"
+                />
+                <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, WEBP. Máximo 5MB</p>
+                
+                <!-- Preview de la imagen -->
+                <div v-if="productForm.image || imagePreview" class="mt-3">
+                  <img
+                    :src="imagePreview || productForm.image"
+                    alt="Preview"
+                    class="w-32 h-32 object-cover rounded-lg border"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Opciones del producto -->
+            <div class="border-t pt-6 space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900">Opciones de Configuración</h3>
+              <p class="text-sm text-gray-600">Selecciona qué opciones tendrá disponible el producto</p>
+
+              <!-- Tallas -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="flex items-center space-x-3 mb-3">
+                  <input
+                    v-model="productForm.options.hasTalla"
+                    type="checkbox"
+                    class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                  />
+                  <span class="font-semibold text-gray-900">¿Tiene tallas?</span>
+                </label>
+
+                <div v-if="productForm.options.hasTalla" class="ml-8 space-y-3">
+                  <p class="text-sm text-gray-600">Selecciona las tallas disponibles:</p>
+                  <div class="grid grid-cols-4 gap-2">
+                    <label
+                      v-for="size in availableSizes"
+                      :key="size"
+                      class="flex items-center space-x-2"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="size"
+                        v-model="productForm.options.tallas"
+                        class="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                      />
+                      <span class="text-sm">{{ size }}</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Géneros -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="flex items-center space-x-3 mb-3">
+                  <input
+                    v-model="productForm.options.hasGenero"
+                    type="checkbox"
+                    class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                  />
+                  <span class="font-semibold text-gray-900">¿Tiene opciones de género?</span>
+                </label>
+
+                <div v-if="productForm.options.hasGenero" class="ml-8 space-y-3">
+                  <p class="text-sm text-gray-600">Selecciona los géneros disponibles:</p>
+                  <div class="flex gap-4">
+                    <label class="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        value="Chico"
+                        v-model="productForm.options.generos"
+                        class="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                      />
+                      <span class="text-sm">Chico</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        value="Chica"
+                        v-model="productForm.options.generos"
+                        class="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                      />
+                      <span class="text-sm">Chica</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Número de dorsal -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="flex items-center space-x-3">
+                  <input
+                    v-model="productForm.options.hasNumero"
+                    type="checkbox"
+                    class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                  />
+                  <span class="font-semibold text-gray-900">¿Permite número de dorsal personalizado?</span>
+                </label>
+                <p v-if="productForm.options.hasNumero" class="ml-8 mt-2 text-sm text-gray-600">
+                  El cliente podrá elegir el número que quiere en su camiseta
+                </p>
+              </div>
+
+              <!-- Nombre personalizado -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <label class="flex items-center space-x-3">
+                  <input
+                    v-model="productForm.options.hasNombre"
+                    type="checkbox"
+                    class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                  />
+                  <span class="font-semibold text-gray-900">¿Permite nombre personalizado?</span>
+                </label>
+                <p v-if="productForm.options.hasNombre" class="ml-8 mt-2 text-sm text-gray-600">
+                  El cliente podrá poner un nombre en su camiseta (ej: apellido del jugador)
+                </p>
+              </div>
+            </div>
+
+            <!-- Botones del formulario -->
+            <div class="flex gap-3 pt-4 border-t">
+              <button
+                type="button"
+                @click="closeProductModal"
+                class="btn-outline flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                :disabled="savingProduct"
+                class="btn-primary flex-1"
+              >
+                <span v-if="savingProduct">Guardando...</span>
+                <span v-else>{{ editingProduct ? 'Guardar Cambios' : 'Crear Producto' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -280,12 +711,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useSupabase } from '~/composables/useSupabase';
-import type { Order, OrderStatus } from '~/types';
+import type { Order, OrderStatus, Product } from '~/types';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '~/types';
 
-const { loginAdmin, logoutAdmin, isAuthenticated, getOrders, updateOrderStatus, getFileUrl } = useSupabase();
+const { loginAdmin, logoutAdmin, getOrders, updateOrderStatus, getFileUrl, getProducts, createProduct, updateProduct, deleteProduct, uploadProductImage } = useSupabase();
 
 // Estado de autenticación
+const isAuthenticated = ref(false);
 const loginForm = ref({
   email: '',
   password: '',
@@ -293,16 +725,49 @@ const loginForm = ref({
 const loggingIn = ref(false);
 const loginError = ref('');
 
+// Estado de tabs
+const activeTab = ref<'orders' | 'products'>('orders');
+
 // Estado de pedidos
 const orders = ref<Order[]>([]);
 const loading = ref(false);
 const filterStatus = ref('');
+const expandedOrders = ref<string[]>([]); // IDs de pedidos expandidos
 
-// Contadores actualizados con los nuevos estados
-const pendingCount = computed(() => orders.value.filter(o => o.status === 'en_revision').length);
+// Estado de productos
+const products = ref<Product[]>([]);
+const loadingProducts = ref(false);
+const showProductModal = ref(false);
+const editingProduct = ref<Product | null>(null);
+const savingProduct = ref(false);
+const imagePreview = ref<string>('');
+const selectedImageFile = ref<File | null>(null);
+
+// Tallas disponibles
+const availableSizes = ['4XS', '3XS', '2XS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
+
+// Formulario de producto
+const productForm = ref({
+  name: '',
+  description: '',
+  price: 0,
+  category: '',
+  image: '',
+  image_path: '',
+  options: {
+    hasTalla: false,
+    hasGenero: false,
+    hasNumero: false,
+    hasNombre: false,
+    tallas: [] as string[],
+    generos: [] as string[],
+  },
+});
+
+// Contadores de pedidos por estado
+const pendingCount = computed(() => orders.value.filter(o => o.status === 'pendiente').length);
 const reviewedCount = computed(() => orders.value.filter(o => o.status === 'revisado').length);
-const readyCount = computed(() => orders.value.filter(o => o.status === 'preparado').length);
-const completedCount = computed(() => orders.value.filter(o => o.status === 'recogido').length);
+const deliveredCount = computed(() => orders.value.filter(o => o.status === 'entregado').length);
 
 // Pedidos filtrados
 const filteredOrders = computed(() => {
@@ -319,7 +784,9 @@ const handleLogin = async () => {
     const success = await loginAdmin(loginForm.value.email, loginForm.value.password);
     
     if (success) {
+      isAuthenticated.value = true;
       await loadOrders();
+      await loadProducts();
     } else {
       loginError.value = 'Email o contraseña incorrectos';
     }
@@ -331,9 +798,11 @@ const handleLogin = async () => {
 };
 
 // Logout
-const handleLogout = () => {
-  logoutAdmin();
+const handleLogout = async () => {
+  await logoutAdmin();
+  isAuthenticated.value = false;
   orders.value = [];
+  products.value = [];
 };
 
 // Cargar pedidos
@@ -369,10 +838,213 @@ const viewProof = (order: Order) => {
   }
 };
 
-// Cargar pedidos al montar si está autenticado
-onMounted(() => {
-  if (isAuthenticated()) {
-    loadOrders();
+// Alternar detalles del pedido
+const toggleOrderDetails = (orderId: string) => {
+  const index = expandedOrders.value.indexOf(orderId);
+  if (index > -1) {
+    expandedOrders.value.splice(index, 1);
+  } else {
+    expandedOrders.value.push(orderId);
+  }
+};
+
+// ============ FUNCIONES DE PRODUCTOS ============
+
+// Cargar productos
+const loadProducts = async () => {
+  loadingProducts.value = true;
+  try {
+    products.value = await getProducts();
+  } catch (error) {
+    console.error('Error loading products:', error);
+    alert('Error al cargar los productos');
+  } finally {
+    loadingProducts.value = false;
+  }
+};
+
+// Abrir modal de producto (crear o editar)
+const openProductModal = (product?: Product) => {
+  if (product) {
+    // Editar producto existente
+    editingProduct.value = product;
+    productForm.value = {
+      name: product.name || '',
+      description: product.description || '',
+      price: product.price || 0,
+      category: product.category || '',
+      image: product.image || '',
+      image_path: product.image_path || '',
+      options: {
+        hasTalla: product.options?.hasTalla || false,
+        hasGenero: product.options?.hasGenero || false,
+        hasNumero: product.options?.hasNumero || false,
+        hasNombre: product.options?.hasNombre || false,
+        tallas: product.options?.tallas || [],
+        generos: product.options?.generos || [],
+      },
+    };
+    imagePreview.value = product.image || '';
+  } else {
+    // Nuevo producto
+    editingProduct.value = null;
+    resetProductForm();
+  }
+  showProductModal.value = true;
+};
+
+// Cerrar modal
+const closeProductModal = () => {
+  showProductModal.value = false;
+  editingProduct.value = null;
+  resetProductForm();
+  imagePreview.value = '';
+  selectedImageFile.value = null;
+};
+
+// Resetear formulario
+const resetProductForm = () => {
+  productForm.value = {
+    name: '',
+    description: '',
+    price: 0,
+    category: '',
+    image: '',
+    image_path: '',
+    options: {
+      hasTalla: false,
+      hasGenero: false,
+      hasNumero: false,
+      hasNombre: false,
+      tallas: [],
+      generos: [],
+    },
+  };
+};
+
+// Manejar subida de imagen
+const handleImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  
+  if (file) {
+    // Validar tamaño (máx 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen es demasiado grande. Máximo 5MB.');
+      return;
+    }
+
+    // Validar tipo
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona una imagen válida.');
+      return;
+    }
+
+    selectedImageFile.value = file;
+
+    // Crear preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imagePreview.value = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Guardar producto (crear o actualizar)
+const saveProduct = async () => {
+  savingProduct.value = true;
+
+  try {
+    // Preparar los datos del producto
+    const productData: any = {
+      name: productForm.value.name,
+      description: productForm.value.description,
+      price: productForm.value.price,
+      category: productForm.value.category,
+      options: {
+        hasTalla: productForm.value.options.hasTalla,
+        hasGenero: productForm.value.options.hasGenero,
+        hasNumero: productForm.value.options.hasNumero,
+        hasNombre: productForm.value.options.hasNombre,
+        tallas: productForm.value.options.hasTalla ? productForm.value.options.tallas : [],
+        generos: productForm.value.options.hasGenero ? productForm.value.options.generos : [],
+      },
+    };
+
+    // Si hay una imagen nueva seleccionada, subirla primero
+    if (selectedImageFile.value) {
+      console.log('Subiendo imagen...', selectedImageFile.value);
+      const imagePath = await uploadProductImage(selectedImageFile.value);
+      
+      if (imagePath) {
+        productData.image_path = imagePath;
+      } else {
+        alert('Error al subir la imagen');
+        savingProduct.value = false;
+        return;
+      }
+    } else if (editingProduct.value?.image_path) {
+      // Mantener la imagen existente
+      productData.image_path = editingProduct.value.image_path;
+    }
+
+    let success = false;
+
+    if (editingProduct.value?.id) {
+      // Actualizar producto existente
+      success = await updateProduct(editingProduct.value.id, productData);
+    } else {
+      // Crear nuevo producto
+      success = await createProduct(productData);
+    }
+
+    if (success) {
+      alert(editingProduct.value ? 'Producto actualizado correctamente' : 'Producto creado correctamente');
+      closeProductModal();
+      await loadProducts();
+    } else {
+      alert('Error al guardar el producto');
+    }
+  } catch (error) {
+    console.error('Error saving product:', error);
+    alert('Error al guardar el producto');
+  } finally {
+    savingProduct.value = false;
+  }
+};
+
+// Confirmar eliminación de producto
+const confirmDeleteProduct = (product: Product) => {
+  if (confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
+    deleteProductById(product.id!);
+  }
+};
+
+// Eliminar producto
+const deleteProductById = async (productId: string) => {
+  try {
+    const success = await deleteProduct(productId);
+    if (success) {
+      alert('Producto eliminado correctamente');
+      await loadProducts();
+    } else {
+      alert('Error al eliminar el producto');
+    }
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    alert('Error al eliminar el producto');
+  }
+};
+
+// Cargar pedidos y productos al montar si está autenticado
+onMounted(async () => {
+  // Verificar si hay sesión activa
+  const { data } = await useSupabase().supabase.auth.getSession();
+  if (data.session) {
+    isAuthenticated.value = true;
+    await loadOrders();
+    await loadProducts();
   }
 });
 </script>

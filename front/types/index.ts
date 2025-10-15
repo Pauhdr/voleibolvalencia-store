@@ -5,7 +5,8 @@ export interface Product {
   name: string;
   price: number;
   description?: string;
-  image?: string;
+  image?: string;          // URL pública de la imagen (generada desde image_path)
+  image_path?: string;     // Path del archivo en Supabase Storage
   options: ProductOptions;
   category?: string;
 }

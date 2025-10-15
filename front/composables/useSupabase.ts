@@ -272,6 +272,108 @@ export const useSupabase = () => {
     return data.publicUrl
   }
 
+  // ============ FUNCIONES DE GESTIÓN DE PRODUCTOS (ADMIN) ============
+
+  // Crear producto
+  const createProduct = async (productData: any): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .insert({
+          name: productData.name,
+          description: productData.description,
+          price: productData.price,
+          category: productData.category,
+          image_path: productData.image_path || null,
+          options: productData.options,
+          active: true,
+        })
+      
+      if (error) {
+        console.error('❌ Error creating product:', error)
+        return false
+      }
+      
+      return true
+    } catch (error) {
+      console.error('❌ Error creating product:', error)
+      return false
+    }
+  }
+
+  // Actualizar producto
+  const updateProduct = async (productId: string, productData: any): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          name: productData.name,
+          description: productData.description,
+          price: productData.price,
+          category: productData.category,
+          image_path: productData.image_path || null,
+          options: productData.options,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', productId)
+      
+      if (error) {
+        console.error('❌ Error updating product:', error)
+        return false
+      }
+      
+      return true
+    } catch (error) {
+      console.error('❌ Error updating product:', error)
+      return false
+    }
+  }
+
+  // Eliminar producto (soft delete - solo marca como inactivo)
+  const deleteProduct = async (productId: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ active: false })
+        .eq('id', productId)
+      
+      if (error) {
+        console.error('❌ Error deleting product:', error)
+        return false
+      }
+      
+      return true
+    } catch (error) {
+      console.error('❌ Error deleting product:', error)
+      return false
+    }
+  }
+
+  // Subir imagen a Storage
+  const uploadProductImage = async (file: File): Promise<string | null> => {
+    try {
+      // Generar nombre único para el archivo
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      const filePath = `${fileName}`
+
+      // Subir archivo
+      const { error: uploadError } = await supabase.storage
+        .from('products')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        console.error('❌ Error uploading image:', uploadError)
+        return null
+      }
+
+      return filePath
+    } catch (error) {
+      console.error('❌ Error uploading image:', error)
+      return null
+    }
+  }
+
   return {
     supabase,
     getProducts,
@@ -284,5 +386,9 @@ export const useSupabase = () => {
     logoutAdmin,
     isAuthenticated,
     getFileUrl,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    uploadProductImage,
   }
 }
