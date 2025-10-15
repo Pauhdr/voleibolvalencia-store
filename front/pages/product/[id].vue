@@ -64,7 +64,7 @@
           </div>
 
           <!-- Configuración del producto -->
-          <div class=" bg-gray-50">
+          <div class="">
             <!-- <h2 class="text-xl font-display font-bold text-gray-900 mb-4">
               Configurar Producto
             </h2> -->

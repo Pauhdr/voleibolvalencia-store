@@ -219,7 +219,7 @@
             </div>
 
             <!-- Comprobante de pago -->
-            <div class="px-6 pb-6 pt-6">
+            <div class="px-2 pb-6 pt-6">
               <h3 class="text-lg font-display font-bold text-gray-900 mb-4">
                 Comprobante de Pago
               </h3>
@@ -242,13 +242,14 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                   Comprobante <span class="text-red-500">*</span>
                 </label>
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-orange-500 transition-colors">
+                
+                <!-- Zona de subida -->
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-orange-500 transition-colors">
                   <input
                     ref="fileInput"
                     type="file"
                     accept="image/*,.pdf"
                     @change="handleFileUpload"
-                    required
                     class="hidden"
                     id="file-upload"
                   />
@@ -268,23 +269,55 @@
                   </label>
                 </div>
                 
-                <!-- Archivo seleccionado -->
-                <div v-if="selectedFile" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
-                  <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span class="text-green-900 font-medium">{{ selectedFile.name }}</span>
+                <!-- Preview del archivo subido -->
+                <div v-if="selectedFile && filePreview" class="mt-4">
+                  <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div class="flex gap-3">
+                      <!-- Miniatura/Preview -->
+                      <div class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+                        <img
+                          v-if="filePreview.type === 'image'"
+                          :src="filePreview.url"
+                          :alt="selectedFile.name"
+                          class="w-full h-full object-cover"
+                        />
+                        <div v-else class="flex flex-col items-center justify-center text-gray-500">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                          <span class="text-xs mt-1">PDF</span>
+                        </div>
+                      </div>
+                      
+                      <!-- Info del archivo -->
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">
+                          {{ selectedFile.name }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                          {{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB
+                        </p>
+                        <div class="flex items-center gap-1 mt-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span class="text-xs text-green-700 font-medium">Listo para enviar</span>
+                        </div>
+                      </div>
+                      
+                      <!-- Botón eliminar -->
+                      <button
+                        type="button"
+                        @click="removeFile()"
+                        class="flex-shrink-0 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Eliminar archivo"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    @click="removeFile"
-                    class="text-red-600 hover:text-red-700"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
@@ -316,7 +349,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '~/stores/cart';
 import { useSupabase } from '~/composables/useSupabase';
@@ -345,6 +378,7 @@ const selectedFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const submitting = ref(false);
 const errorMessage = ref('');
+const filePreview = ref<{ url: string; type: 'image' | 'pdf' } | null>(null);
 
 // Estado de las secciones colapsables
 const openSections = ref({
@@ -369,10 +403,12 @@ const isFormValid = computed(() => {
   );
 });
 
-// Manejo de archivo
+// Manejo de un único archivo
 const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
+  
+  console.log('📁 Archivo seleccionado:', file);
   
   if (file) {
     // Validar tamaño (10MB máximo)
@@ -381,16 +417,49 @@ const handleFileUpload = (event: Event) => {
       return;
     }
     
+    // Liberar URL anterior si existe
+    if (filePreview.value) {
+      URL.revokeObjectURL(filePreview.value.url);
+    }
+    
+    // Guardar archivo
     selectedFile.value = file;
+    
+    // Crear preview
+    const fileType = file.type.startsWith('image/') ? 'image' : 'pdf';
+    const url = URL.createObjectURL(file);
+    filePreview.value = { url, type: fileType };
+    
+    console.log('✅ Preview creado:', {
+      fileName: file.name,
+      fileType,
+      previewUrl: url,
+      selectedFile: selectedFile.value,
+      filePreview: filePreview.value
+    });
   }
 };
 
 const removeFile = () => {
+  // Liberar URL del preview
+  if (filePreview.value) {
+    URL.revokeObjectURL(filePreview.value.url);
+  }
+  
   selectedFile.value = null;
+  filePreview.value = null;
+  
   if (fileInput.value) {
     fileInput.value.value = '';
   }
 };
+
+// Limpiar URLs al desmontar el componente
+onUnmounted(() => {
+  if (filePreview.value) {
+    URL.revokeObjectURL(filePreview.value.url);
+  }
+});
 
 // Envío del formulario
 const handleSubmit = async () => {
@@ -411,7 +480,7 @@ const handleSubmit = async () => {
       email: formData.value.email,
     });
 
-    // Crear pedido en PocketBase
+    // Crear pedido en Supabase
     const orderData = {
       player_name: formData.value.player_name,
       team: formData.value.team,

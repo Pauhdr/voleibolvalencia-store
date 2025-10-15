@@ -84,7 +84,7 @@
       </div> -->
 
       <!-- Información de contacto -->
-      <div class="bg-gray-50 rounded-lg p-6 mb-8">
+      <div class="bg-gray-100 rounded-lg p-6 mb-8">
         <h3 class="font-bold text-gray-900 mb-3">¿Tienes alguna duda?</h3>
         <p class="text-gray-600 mb-4">
           Si tienes cualquier pregunta sobre tu pedido, no dudes en contactarnos:
