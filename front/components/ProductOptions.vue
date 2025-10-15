@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-4">
+  <div class="space-y-4 pb-24 md:pb-0">
     <!-- Talla -->
     <div v-if="product.options.hasTalla">
       <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -119,27 +119,41 @@
         <button
           type="button"
           @click="incrementQuantity"
-          class="w-10 h-10 rounded-lg bg-orange-600 hover:bg-orange-700 flex items-center justify-center font-bold text-white transition-colors"
+          class="w-10 h-10 rounded-lg bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-gray-700 transition-colors"
         >
           +
         </button>
       </div>
     </div>
 
-    <!-- Botón añadir al carrito -->
-    <button
-      type="button"
-      @click="addToCart"
-      :disabled="!isValid"
-      class="btn-primary w-full mt-4"
-    >
-      <span>Añadir al carrito</span>
-    </button>
+    <!-- Botón añadir al carrito - Fijo en móvil -->
+    <div class="fixed md:static bottom-0 left-0 right-0 bg-white border-t md:border-t-0 shadow-lg md:shadow-none p-4 md:p-0 z-40">
+      <div class="flex items-center justify-between gap-3 md:flex-col md:items-stretch">
+        <!-- Precio total (visible en móvil) -->
+        <div class="flex flex-col md:hidden">
+          <span class="text-sm text-gray-600">Total</span>
+          <span class="text-2xl font-bold text-orange-600">
+            {{ totalPrice.toFixed(2) }}€
+          </span>
+        </div>
+        
+        <!-- Botón -->
+        <button
+          type="button"
+          @click="addToCart"
+          :disabled="!isValid"
+          class="btn-primary flex-1 md:w-full md:mt-4"
+        >
+          <span class="md:hidden">Añadir</span>
+          <span class="hidden md:inline">Añadir al carrito</span>
+        </button>
+      </div>
 
-    <!-- Mensaje de error -->
-    <p v-if="errorMessage" class="text-red-600 text-sm text-center">
-      {{ errorMessage }}
-    </p>
+      <!-- Mensaje de error -->
+      <p v-if="errorMessage" class="text-red-600 text-sm text-center mt-2">
+        {{ errorMessage }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -178,6 +192,11 @@ const isValid = computed(() => {
   if (props.product.options.hasGenero && !selectedOptions.value.genero) return false;
   if (props.product.options.hasColor && !selectedOptions.value.color) return false;
   return true;
+});
+
+// Precio total
+const totalPrice = computed(() => {
+  return props.product.price * quantity.value;
 });
 
 // Métodos

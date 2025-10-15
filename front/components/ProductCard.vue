@@ -3,18 +3,18 @@
     :to="`/product/${product.id}`"
     class="group block"
   >
-    <article class="relative overflow-hidden rounded-2xl bg-white border border-gray-200 transition-all duration-300 hover:border-orange-300">
+    <article class="relative overflow-hidden">
       <!-- Imagen del producto -->
       <div class="aspect-square overflow-hidden bg-gray-100">
         <img
           v-if="product.image"
           :src="product.image"
           :alt="product.name"
-          class="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
+          class="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90 rounded-2xl"
         />
         <div
           v-else
-          class="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100"
+          class="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -34,20 +34,20 @@
       </div>
 
       <!-- Contenido -->
-      <div class="p-5">
+      <div class="p-2">
         <!-- Nombre del producto -->
-        <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem] transition-colors">
+        <h3 class="text-sm font-semibold text-gray-900 mb-1 transition-colors">
           {{ product.name }}
         </h3>
 
         <!-- Precio -->
         <div class="flex items-baseline justify-between">
-          <p class="text-2xl font-bold">
+          <p class="text-xl">
             {{ product.price.toFixed(2) }}€
           </p>
           
           <!-- Icono de flecha -->
-          <div class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-50 text-orange-600 transition-all group-hover:bg-orange-600 group-hover:text-white">
+          <!-- <div class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-50 text-orange-600 transition-all group-hover:bg-orange-600 group-hover:text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-4 w-4"
@@ -62,7 +62,7 @@
                 d="M9 5l7 7-7 7"
               />
             </svg>
-          </div>
+          </div> -->
         </div>
       </div>
     </article>

@@ -15,7 +15,7 @@
     </div>
 
     <!-- Producto -->
-    <div v-else-if="product" class="max-w-6xl mx-auto">
+    <div v-else-if="product" class="max-w-6xl mx-auto pb-24 md:pb-0">
       <!-- Breadcrumb -->
       <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6">
         <NuxtLink to="/" class="hover:text-orange-600 transition-colors">
@@ -50,11 +50,11 @@
         <div class="space-y-6 h-full flex flex-col justify-between">
           <!-- Título y precio -->
           <div>
-            <h1 class="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-3">
+            <h1 class="text-3xl md:text-4xl font-display  text-gray-900 mb-3">
               {{ product.name }}
             </h1>
             <div class="flex items-baseline space-x-3 mb-4">
-              <span class="text-4xl font-bold text-orange-600">
+              <span class="text-4xl font-bold">
                 {{ product.price.toFixed(2) }}€
               </span>
             </div>
@@ -64,10 +64,10 @@
           </div>
 
           <!-- Configuración del producto -->
-          <div class="card p-6 bg-gray-50">
-            <h2 class="text-xl font-display font-bold text-gray-900 mb-4">
+          <div class=" bg-gray-50">
+            <!-- <h2 class="text-xl font-display font-bold text-gray-900 mb-4">
               Configurar Producto
-            </h2>
+            </h2> -->
             <ProductOptions
               :product="product"
               @add-to-cart="handleAddToCart"

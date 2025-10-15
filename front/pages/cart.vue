@@ -39,11 +39,11 @@
 
         <!-- Resumen del pedido -->
         <div class="lg:col-span-1">
-          <div class="card sticky top-24">
+          <div class="border border-gray-200 rounded-lg sticky top-24">
             <div class="p-6">
-              <h3 class="text-xl font-display font-bold text-gray-900 mb-4">
+              <!-- <h3 class="text-xl font-display font-bold text-gray-900 mb-4">
                 Resumen del Pedido
-              </h3>
+              </h3> -->
 
               <div class="space-y-3 mb-6">
                 <div class="flex justify-between text-gray-600">
@@ -56,7 +56,7 @@
                 </div>
                 <div class="border-t border-gray-200 pt-3 flex justify-between text-lg font-bold text-gray-900">
                   <span>Total</span>
-                  <span class="text-orange-600">{{ cartStore.total.toFixed(2) }}€</span>
+                  <span>{{ cartStore.total.toFixed(2) }}€</span>
                 </div>
               </div>
 

@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-    <div class="flex gap-4">
+  <div class="p-4">
+    <div class="flex gap-4 relative">
       <!-- Imagen del producto -->
       <div
-        class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0"
+        class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden"
       >
         <img
           v-if="item.image"
@@ -30,7 +30,7 @@
       </div>
 
       <!-- Detalles del producto -->
-      <div class="flex-grow">
+      <div class="flex-grow flex flex-col justify-between">
         <h4 class="font-semibold text-gray-900">{{ item.name }}</h4>
 
         <!-- Opciones seleccionadas -->
@@ -54,37 +54,38 @@
 
         <!-- Cantidad y precio -->
         <div class="mt-2 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
+            <div class="text-right">
+            <!-- <p class="text-sm text-gray-500">
+              {{ item.price.toFixed(2) }}€ / ud
+            </p> -->
+            <p class="font-bold text-gray-900">
+              {{ (item.price * item.quantity).toFixed(2) }}€
+            </p>
+          </div>
+          <div class="flex items-center space-x-1">
             <button
               @click="$emit('update-quantity', index, item.quantity - 1)"
-              class="w-7 h-7 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 transition-colors"
+              class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 transition-colors"
             >
               -
             </button>
             <span class="w-8 text-center font-medium">{{ item.quantity }}</span>
             <button
               @click="$emit('update-quantity', index, item.quantity + 1)"
-              class="w-7 h-7 rounded bg-orange-600 hover:bg-orange-700 flex items-center justify-center text-white transition-colors"
+              class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 transition-colors"
             >
               +
             </button>
           </div>
 
-          <div class="text-right">
-            <p class="text-sm text-gray-500">
-              {{ item.price.toFixed(2) }}€ / ud
-            </p>
-            <p class="font-bold text-gray-900">
-              {{ (item.price * item.quantity).toFixed(2) }}€
-            </p>
-          </div>
+          
         </div>
       </div>
 
       <!-- Botón eliminar -->
       <button
         @click="$emit('remove', index)"
-        class="text-red-500 hover:text-red-700 transition-colors self-start"
+        class="text-red-500 hover:text-red-700 transition-colors self-start absolute top-0 right-0"
         title="Eliminar"
       >
         <svg
