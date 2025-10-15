@@ -190,6 +190,16 @@
               </svg>
               Actualizar
             </button>
+            <button 
+              @click="exportToExcel" 
+              class="btn-primary flex items-center gap-2 ml-auto"
+              :disabled="filteredOrders.length === 0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Exportar a Excel ({{ filteredOrders.length }})
+            </button>
           </div>
         </div>
 
@@ -1113,6 +1123,110 @@ const viewProof = (order: Order) => {
   if (order.payment_proof && order.id) {
     const url = getFileUrl(order, order.payment_proof as string);
     window.open(url, '_blank');
+  }
+};
+
+// Exportar pedidos a Excel
+const exportToExcel = () => {
+  if (filteredOrders.value.length === 0) {
+    alert('No hay pedidos para exportar');
+    return;
+  }
+
+  try {
+    // Preparar los datos para Excel - FORMATO PARA FABRICACIÓN
+    const excelData: any[] = [];
+
+    // Encabezados
+    const headers = [
+      'Producto',
+      'Talla',
+      'Género',
+      'Número Dorsal',
+      'Nombre/Texto',
+      'Cantidad',
+    ];
+    excelData.push(headers);
+
+    // Recorrer todos los pedidos filtrados
+    filteredOrders.value.forEach((order) => {
+      // Estados en español
+      const estadoMap: Record<string, string> = {
+        en_revision: 'En Revisión',
+        revisado: 'Revisado',
+        pedido: 'Pedido Realizado',
+        preparado: 'Preparado',
+        recogido: 'Recogido',
+        cancelado: 'Cancelado',
+      };
+      const estado = estadoMap[order.status || ''] || order.status || 'N/A';
+
+      // Fecha formateada
+      const fecha = order.created 
+        ? new Date(order.created).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          })
+        : 'N/A';
+
+      // Recorrer cada producto del pedido
+      order.items?.forEach((item) => {
+        // Para cada unidad del producto (si cantidad > 1, crear múltiples filas)
+        for (let i = 0; i < item.quantity; i++) {
+          const fila = [
+            item.name || 'Sin nombre',
+            item.options?.talla || '-',
+            item.options?.genero || '-',
+            item.options?.numero || '-',
+            item.options?.nombre || '-',
+            1
+          ];
+          excelData.push(fila);
+        }
+      });
+    });
+
+    // Crear el contenido CSV
+    const csvContent = excelData
+      .map((row) =>
+        row.map((cell: any) => {
+          // Escapar comillas dobles y envolver en comillas si contiene comas, saltos de línea o comillas
+          const cellStr = String(cell);
+          if (cellStr.includes(',') || cellStr.includes('\n') || cellStr.includes('"')) {
+            return `"${cellStr.replace(/"/g, '""')}"`;
+          }
+          return cellStr;
+        }).join(',')
+      )
+      .join('\n');
+
+    // Crear el Blob con BOM para UTF-8 (para que Excel reconozca los acentos)
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    // Crear enlace de descarga
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    
+    // Nombre del archivo con fecha y filtro
+    const fechaActual = new Date().toISOString().split('T')[0];
+    const filtroNombre = filterStatus.value 
+      ? `_${filterStatus.value}`
+      : '_todos';
+    link.setAttribute('download', `pedidos${filtroNombre}_${fechaActual}.csv`);
+    
+    // Descargar
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    // alert(`Archivo exportado correctamente con ${excelData.length - 1} productos para fabricación`);
+  } catch (error) {
+    console.error('Error al exportar:', error);
+    alert('Error al exportar los pedidos');
   }
 };
 
