@@ -66,8 +66,14 @@
             </h1>
             <p class="text-sm text-gray-600">Gestión del club</p>
           </div>
-          <button @click="handleLogout" class="btn-secondary">
-            Cerrar Sesión
+          <button 
+            @click="handleLogout" 
+            class="p-3 rounded-lg hover:bg-gray-100 transition-colors group relative"
+            title="Cerrar sesión"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 group-hover:text-red-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
           </button>
         </div>
         
@@ -168,12 +174,15 @@
             </div>
           </div>
         </div>
-
         <!-- Filtros y Acciones -->
-        <div class="card p-4 mb-6">
+        <div class="p-2 mb-6 border-b flex">
+          <h3 class="text-xl font-bold mr-auto">Listado de pedidos</h3>
+          
+
+          <!-- Select en Desktop y botones -->
           <div class="flex flex-wrap items-center gap-4">
-            <div class="flex flex-col items-start mr-auto">
-              <label class="text-sm font-semibold text-gray-700 mr-2">Filtrar por estado:</label>
+            <div class="hidden md:flex flex-col items-start mr-auto">
+              <!-- <label class="text-sm font-semibold text-gray-700 mr-2 mb-1">Filtrar por estado:</label> -->
               <select v-model="filterStatus" class="select-field w-auto">
                 <option value="">Todos</option>
                 <option value="en_revision">En Revisión</option>
@@ -184,7 +193,7 @@
                 <option value="cancelado">Cancelado</option>
               </select>
             </div>
-            <button @click="loadOrders" class="btn-outline flex items-center gap-2 md:ml-auto">
+            <button @click="loadOrders" class="flex items-center gap-2 md:ml-auto">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
@@ -192,7 +201,7 @@
             </button>
             <button 
               @click="exportToExcel" 
-              class="btn-primary flex items-center gap-2 "
+              class="bg-zinc-900 text-white p-1 rounded px-2 flex items-center gap-2 text-sm"
               :disabled="filteredOrders.length === 0"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -202,7 +211,137 @@
             </button>
           </div>
         </div>
+<!-- Pills en Mobile -->
+          <div class="md:hidden mb-4 ">
+            <!-- <label class="text-sm font-semibold text-gray-700 mb-3 block">Filtrar por estado:</label> -->
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+              <!-- Todos -->
+              <button
+                @click="filterStatus = ''"
+                :class="[
+                  'rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+                  filterStatus === ''
+                    ? 'bg-orange-600 text-white px-4 py-2'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 p-2'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="filterStatus === '' ? 'text-white' : 'text-orange-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                <template v-if="filterStatus === ''">
+                  <span>Todos</span>
+                </template>
+              </button>
 
+              <!-- En Revisión -->
+              <button
+                @click="filterStatus = 'en_revision'"
+                :class="[
+                  'rounded-lg text-sm font-medium transition-all flex items-center gap-2 w-fit',
+                  filterStatus === 'en_revision'
+                    ? 'bg-gray-600 text-white px-4 py-2'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 p-2'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="filterStatus === 'en_revision' ? 'text-white' : 'text-gray-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <template v-if="filterStatus === 'en_revision'">
+                  <span class="text-nowrap">En Revisión</span>
+                </template>
+              </button>
+
+              <!-- Revisado -->
+              <button
+                @click="filterStatus = 'revisado'"
+                :class="[
+                  'rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+                  filterStatus === 'revisado'
+                    ? 'bg-yellow-500 text-white px-4 py-2'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 p-2'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="filterStatus === 'revisado' ? 'text-white' : 'text-yellow-500'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <template v-if="filterStatus === 'revisado'">
+                  <span>Revisado</span>
+                </template>
+              </button>
+
+              <!-- Pedido -->
+              <button
+                @click="filterStatus = 'pedido'"
+                :class="[
+                  'rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+                  filterStatus === 'pedido'
+                    ? 'bg-purple-600 text-white px-4 py-2'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 p-2'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="filterStatus === 'pedido' ? 'text-white' : 'text-purple-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <template v-if="filterStatus === 'pedido'">
+                  <span>Pedido</span>
+                </template>
+              </button>
+
+              <!-- Preparado -->
+              <button
+                @click="filterStatus = 'preparado'"
+                :class="[
+                  'rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+                  filterStatus === 'preparado'
+                    ? 'bg-blue-600 text-white px-4 py-2'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 p-2'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="filterStatus === 'preparado' ? 'text-white' : 'text-blue-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <template v-if="filterStatus === 'preparado'">
+                  <span>Preparado</span>
+                </template>
+              </button>
+
+              <!-- Entregado -->
+              <button
+                @click="filterStatus = 'recogido'"
+                :class="[
+                  'rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+                  filterStatus === 'recogido'
+                    ? 'bg-green-600 text-white px-4 py-2'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 p-2'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="filterStatus === 'recogido' ? 'text-white' : 'text-green-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <template v-if="filterStatus === 'recogido'">
+                  <span>Entregado</span>
+                </template>
+              </button>
+
+              <!-- Cancelado -->
+              <!-- <button
+                @click="filterStatus = 'cancelado'"
+                :class="[
+                  'rounded-full text-sm font-medium transition-all flex items-center gap-2',
+                  filterStatus === 'cancelado'
+                    ? 'bg-red-600 text-white shadow-md px-4 py-2'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 p-2'
+                ]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="filterStatus === 'cancelado' ? 'text-white' : 'text-red-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <template v-if="filterStatus === 'cancelado'">
+                  <span>Cancelado</span>
+                </template>
+              </button> -->
+            </div>
+          </div>
         <!-- Barra de acciones para pedidos seleccionados -->
         <transition
           enter-active-class="transition-all duration-200 ease-out"
@@ -450,7 +589,7 @@
 
         <!-- Paginación -->
         <div v-if="filteredOrders.length > 0 && totalPages > 1" class="mt-6">
-          <div class="card p-4">
+          <div class=" p-4">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
               <!-- Información de la página -->
               <div class="text-sm text-gray-600">
@@ -513,8 +652,8 @@
               </div>
 
               <!-- Selector de items por página -->
-              <div class="flex items-center gap-2 text-sm">
-                <label class="text-gray-600">Por página:</label>
+              <div class="flex items-center gap-2 text-sm w-full px-4">
+                <label class="text-gray-600 w-full">Por página:</label>
                 <select 
                   v-model="itemsPerPage" 
                   @change="currentPage = 1"
