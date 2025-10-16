@@ -184,6 +184,7 @@
             <div class="hidden md:flex flex-col items-start mr-auto">
               <!-- <label class="text-sm font-semibold text-gray-700 mr-2 mb-1">Filtrar por estado:</label> -->
               <select v-model="filterStatus" class="select-field w-auto">
+                
                 <option value="">Todos</option>
                 <option value="en_revision">En Revisión</option>
                 <option value="revisado">Revisado</option>
@@ -454,7 +455,7 @@
                 <div class="min-w-0 hidden md:block">
                   <p class="text-sm text-gray-600 truncate">{{ order.email }}</p>
                   <p class="text-xs text-gray-400">
-                    {{ order.created ? new Date(order.created).toLocaleDateString('es-ES') : 'N/A' }}
+                    {{ order.created_at ? new Date(order.created_at).toLocaleDateString('es-ES') : 'N/A' }}
                   </p>
                 </div>
 
@@ -519,7 +520,7 @@
                     <div>
                       <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Fecha</p>
                       <p class="font-semibold text-gray-900">
-                        {{ order.created ? new Date(order.created).toLocaleDateString('es-ES', { 
+                        {{ order.created_at ? new Date(order.created_at).toLocaleDateString('es-ES', { 
                           day: 'numeric', 
                           month: 'long', 
                           year: 'numeric' 
@@ -652,7 +653,7 @@
               </div>
 
               <!-- Selector de items por página -->
-              <div class="flex items-center gap-2 text-sm w-full px-4">
+              <div class="flex items-center gap-2 text-sm w-full md:w-1/3 px-4">
                 <label class="text-gray-600 w-full">Por página:</label>
                 <select 
                   v-model="itemsPerPage" 
@@ -1568,8 +1569,8 @@ const exportToExcel = () => {
       const estado = estadoMap[order.status || ''] || order.status || 'N/A';
 
       // Fecha formateada
-      const fecha = order.created 
-        ? new Date(order.created).toLocaleDateString('es-ES', {
+      const fecha = order.created_at 
+        ? new Date(order.created_at).toLocaleDateString('es-ES', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',

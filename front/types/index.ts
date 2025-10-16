@@ -87,8 +87,8 @@ export interface Order {
   payment_proof?: File | string;
   status: OrderStatus;
   total: number;
-  created?: string;
-  updated?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export type OrderStatus = 
@@ -101,12 +101,12 @@ export type OrderStatus =
 
 // Labels amigables para mostrar en la UI
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  en_revision: '🔍 En Revisión',
-  revisado: '✅ Revisado',
-  pedido: '📦 Pedido Realizado',
-  preparado: '🎽 Preparado para Recoger',
-  recogido: '✔️ Recogido',
-  cancelado: '❌ Cancelado',
+  en_revision: 'Pendiente',
+  revisado: 'Revisado',
+  pedido: 'Pedido Realizado',
+  preparado: 'Preparado',
+  recogido: 'Recogido',
+  cancelado: 'Cancelado',
 };
 
 // Colores para cada estado (Tailwind CSS)
