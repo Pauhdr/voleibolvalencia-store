@@ -1065,7 +1065,7 @@
                 </div>
 
                 <!-- TABLA ÚNICA (unisex) -->
-                <div v-if="!productForm.size_chart.hasSeparateGenders">
+                <div v-if="!productForm.size_chart.hasSeparateGenders" class="space-y-6">
                 <!-- Gestión de columnas (medidas) -->
                 <div class="bg-gray-50 p-4 rounded-lg">
                   <div class="flex items-center justify-between mb-3">
@@ -1194,7 +1194,7 @@
                 </div>
 
                 <!-- Preview de la tabla -->
-                <div v-if="productForm.size_chart.rows.length > 0" class="bg-blue-50 p-4 rounded-lg">
+                <!-- <div v-if="productForm.size_chart.rows.length > 0" class="bg-blue-50 p-4 rounded-lg">
                   <h4 class="font-semibold text-blue-900 mb-2">📏 Vista previa de la tabla</h4>
                   <p class="text-sm text-blue-700 mb-3">Esta tabla se mostrará a los clientes en la página del producto</p>
                   <div class="bg-white p-3 rounded border border-blue-200 overflow-x-auto">
@@ -1229,9 +1229,281 @@
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </div> -->
                 </div>
                 <!-- FIN TABLA ÚNICA -->
+
+                <!-- TABLAS SEPARADAS POR GÉNERO -->
+                <div v-else class="space-y-6">
+                  <!-- TABLA CHICOS -->
+                  <div class="border-2 border-blue-200 rounded-lg p-4">
+                    <h3 class="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+                      Tabla para Chicos
+                    </h3>
+
+                    <!-- Gestión de columnas chicos -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-gray-900">Medidas (Columnas)</h4>
+                        <button
+                          type="button"
+                          @click="addSizeChartColumnGender('boys')"
+                          class="btn-outline text-sm flex items-center gap-1"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                          Añadir medida
+                        </button>
+                      </div>
+                      
+                      <div v-if="productForm.size_chart.boys!.columns.length > 0" class="space-y-2">
+                        <div
+                          v-for="(column, index) in productForm.size_chart.boys!.columns"
+                          :key="column.id"
+                          class="flex items-center gap-2"
+                        >
+                          <input
+                            v-model="column.name"
+                            type="text"
+                            class="input-field flex-1"
+                            placeholder="Ej: Pecho, Cintura, Largo..."
+                          />
+                          <button
+                            type="button"
+                            @click="removeSizeChartColumnGender('boys', index)"
+                            class="text-red-600 hover:text-red-800 p-2"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <p v-else class="text-sm text-gray-500 text-center py-2">
+                        No hay medidas definidas. Haz clic en "Añadir medida" para empezar.
+                      </p>
+                    </div>
+
+                    <!-- Gestión de tallas chicos -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-gray-900">Tallas y Medidas</h4>
+                        <button
+                          type="button"
+                          @click="addSizeChartRowGender('boys')"
+                          class="btn-outline text-sm flex items-center gap-1"
+                          :disabled="productForm.size_chart.boys!.columns.length === 0"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                          Añadir talla
+                        </button>
+                      </div>
+
+                      <div v-if="productForm.size_chart.boys!.columns.length === 0" class="text-sm text-gray-500 text-center py-4">
+                        Primero define las medidas (columnas) antes de añadir tallas
+                      </div>
+
+                      <div v-else-if="productForm.size_chart.boys!.rows.length > 0" class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                          <thead class="bg-gray-100">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Talla</th>
+                              <th
+                                v-for="column in productForm.size_chart.boys!.columns"
+                                :key="column.id"
+                                class="px-4 py-2 text-left text-sm font-semibold text-gray-700"
+                              >
+                                {{ column.name }}
+                              </th>
+                              <th class="px-4 py-2 w-20"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="(row, rowIndex) in productForm.size_chart.boys!.rows"
+                              :key="rowIndex"
+                              class="border-t border-gray-200"
+                            >
+                              <td class="px-4 py-2">
+                                <input
+                                  v-model="row.size"
+                                  type="text"
+                                  class="input-field"
+                                  placeholder="S, M, L..."
+                                />
+                              </td>
+                              <td
+                                v-for="column in productForm.size_chart.boys!.columns"
+                                :key="column.id"
+                                class="px-4 py-2"
+                              >
+                                <input
+                                  v-model="row.measurements[column.id]"
+                                  type="text"
+                                  class="input-field"
+                                  :placeholder="`Ej: 45-48`"
+                                />
+                              </td>
+                              <td class="px-4 py-2 text-center">
+                                <button
+                                  type="button"
+                                  @click="removeSizeChartRowGender('boys', rowIndex)"
+                                  class="text-red-600 hover:text-red-800"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div v-else class="text-sm text-gray-500 text-center py-2">
+                        No hay tallas definidas. Haz clic en "Añadir talla" para empezar.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- TABLA CHICAS -->
+                  <div class="border-2 border-pink-200 rounded-lg p-4">
+                    <h3 class="text-lg font-bold text-pink-900 mb-4 flex items-center gap-2">
+                      Tabla para Chicas
+                    </h3>
+
+                    <!-- Gestión de columnas chicas -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-gray-900">Medidas (Columnas)</h4>
+                        <button
+                          type="button"
+                          @click="addSizeChartColumnGender('girls')"
+                          class="btn-outline text-sm flex items-center gap-1"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                          Añadir medida
+                        </button>
+                      </div>
+                      
+                      <div v-if="productForm.size_chart.girls!.columns.length > 0" class="space-y-2">
+                        <div
+                          v-for="(column, index) in productForm.size_chart.girls!.columns"
+                          :key="column.id"
+                          class="flex items-center gap-2"
+                        >
+                          <input
+                            v-model="column.name"
+                            type="text"
+                            class="input-field flex-1"
+                            placeholder="Ej: Pecho, Cintura, Largo..."
+                          />
+                          <button
+                            type="button"
+                            @click="removeSizeChartColumnGender('girls', index)"
+                            class="text-red-600 hover:text-red-800 p-2"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <p v-else class="text-sm text-gray-500 text-center py-2">
+                        No hay medidas definidas. Haz clic en "Añadir medida" para empezar.
+                      </p>
+                    </div>
+
+                    <!-- Gestión de tallas chicas -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-gray-900">Tallas y Medidas</h4>
+                        <button
+                          type="button"
+                          @click="addSizeChartRowGender('girls')"
+                          class="btn-outline text-sm flex items-center gap-1"
+                          :disabled="productForm.size_chart.girls!.columns.length === 0"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                          Añadir talla
+                        </button>
+                      </div>
+
+                      <div v-if="productForm.size_chart.girls!.columns.length === 0" class="text-sm text-gray-500 text-center py-4">
+                        Primero define las medidas (columnas) antes de añadir tallas
+                      </div>
+
+                      <div v-else-if="productForm.size_chart.girls!.rows.length > 0" class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                          <thead class="bg-gray-100">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Talla</th>
+                              <th
+                                v-for="column in productForm.size_chart.girls!.columns"
+                                :key="column.id"
+                                class="px-4 py-2 text-left text-sm font-semibold text-gray-700"
+                              >
+                                {{ column.name }}
+                              </th>
+                              <th class="px-4 py-2 w-20"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="(row, rowIndex) in productForm.size_chart.girls!.rows"
+                              :key="rowIndex"
+                              class="border-t border-gray-200"
+                            >
+                              <td class="px-4 py-2">
+                                <input
+                                  v-model="row.size"
+                                  type="text"
+                                  class="input-field"
+                                  placeholder="S, M, L..."
+                                />
+                              </td>
+                              <td
+                                v-for="column in productForm.size_chart.girls!.columns"
+                                :key="column.id"
+                                class="px-4 py-2"
+                              >
+                                <input
+                                  v-model="row.measurements[column.id]"
+                                  type="text"
+                                  class="input-field"
+                                  :placeholder="`Ej: 45-48`"
+                                />
+                              </td>
+                              <td class="px-4 py-2 text-center">
+                                <button
+                                  type="button"
+                                  @click="removeSizeChartRowGender('girls', rowIndex)"
+                                  class="text-red-600 hover:text-red-800"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div v-else class="text-sm text-gray-500 text-center py-2">
+                        No hay tallas definidas. Haz clic en "Añadir talla" para empezar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- FIN TABLAS SEPARADAS -->
               </div>
             </div>
 
@@ -1366,6 +1638,19 @@ const paginatedOrders = computed(() => {
 // Resetear página cuando cambia el filtro
 watch(filterStatus, () => {
   currentPage.value = 1;
+});
+
+// Watcher para inicializar/limpiar estructuras cuando cambia el modo de tabla de tallas
+watch(() => productForm.value.size_chart.hasSeparateGenders, (newValue) => {
+  if (newValue) {
+    // Cambió a tablas separadas: inicializar boys y girls si están vacías
+    if (!productForm.value.size_chart.boys) {
+      productForm.value.size_chart.boys = { columns: [], rows: [] };
+    }
+    if (!productForm.value.size_chart.girls) {
+      productForm.value.size_chart.girls = { columns: [], rows: [] };
+    }
+  }
 });
 
 // Función para generar números de página con elipsis
@@ -1669,11 +1954,34 @@ const openProductModal = (product?: Product) => {
         tallas: product.options?.tallas || [],
         generos: product.options?.generos || [],
       },
-      size_chart: product.size_chart || {
+      size_chart: product.size_chart ? {
+        enabled: product.size_chart.enabled || false,
+        unit: product.size_chart.unit || 'cm',
+        hasSeparateGenders: product.size_chart.hasSeparateGenders || false,
+        columns: product.size_chart.columns || [],
+        rows: product.size_chart.rows || [],
+        boys: product.size_chart.boys || {
+          columns: [],
+          rows: [],
+        },
+        girls: product.size_chart.girls || {
+          columns: [],
+          rows: [],
+        },
+      } : {
         enabled: false,
         unit: 'cm',
+        hasSeparateGenders: false,
         columns: [],
         rows: [],
+        boys: {
+          columns: [],
+          rows: [],
+        },
+        girls: {
+          columns: [],
+          rows: [],
+        },
       },
     };
     imagePreview.value = product.image || '';
@@ -1714,8 +2022,17 @@ const resetProductForm = () => {
     size_chart: {
       enabled: false,
       unit: 'cm',
+      hasSeparateGenders: false,
       columns: [],
       rows: [],
+      boys: {
+        columns: [],
+        rows: [],
+      },
+      girls: {
+        columns: [],
+        rows: [],
+      },
     },
   };
 };
@@ -1788,6 +2105,47 @@ const addSizeChartRow = () => {
 // Eliminar fila de la tabla de tallas
 const removeSizeChartRow = (index: number) => {
   productForm.value.size_chart.rows.splice(index, 1);
+};
+
+// ============ FUNCIONES PARA TABLAS POR GÉNERO ============
+
+// Añadir columna a la tabla de un género específico
+const addSizeChartColumnGender = (gender: 'boys' | 'girls') => {
+  const columnId = `col-${Date.now()}-${Math.random()}`;
+  productForm.value.size_chart[gender]!.columns.push({
+    id: columnId,
+    name: '',
+  });
+};
+
+// Eliminar columna de la tabla de un género específico
+const removeSizeChartColumnGender = (gender: 'boys' | 'girls', index: number) => {
+  const columnId = productForm.value.size_chart[gender]!.columns[index].id;
+  productForm.value.size_chart[gender]!.columns.splice(index, 1);
+  
+  // Eliminar las medidas de esta columna en todas las filas
+  productForm.value.size_chart[gender]!.rows.forEach(row => {
+    delete row.measurements[columnId];
+  });
+};
+
+// Añadir fila (talla) a la tabla de un género específico
+const addSizeChartRowGender = (gender: 'boys' | 'girls') => {
+  const measurements: Record<string, string> = {};
+  // Inicializar medidas vacías para cada columna
+  productForm.value.size_chart[gender]!.columns.forEach(column => {
+    measurements[column.id] = '';
+  });
+  
+  productForm.value.size_chart[gender]!.rows.push({
+    size: '',
+    measurements,
+  });
+};
+
+// Eliminar fila de la tabla de un género específico
+const removeSizeChartRowGender = (gender: 'boys' | 'girls', index: number) => {
+  productForm.value.size_chart[gender]!.rows.splice(index, 1);
 };
 
 // ============ FIN FUNCIONES DE TABLA DE TALLAS ============
