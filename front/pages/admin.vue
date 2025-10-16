@@ -186,12 +186,12 @@
               <select v-model="filterStatus" class="select-field w-auto">
                 
                 <option value="">Todos</option>
-                <option value="en_revision">En Revisión</option>
-                <option value="revisado">Revisado</option>
-                <option value="pedido">Pedido Realizado</option>
-                <option value="preparado">Preparado</option>
-                <option value="recogido">Recogido</option>
-                <option value="cancelado">Cancelado</option>
+                <option value="en_revision">{{ ORDER_STATUS_LABELS.en_revision }}</option>
+                <option value="revisado">{{ ORDER_STATUS_LABELS.revisado }}</option>
+                <option value="pedido">{{ ORDER_STATUS_LABELS.pedido }}</option>
+                <option value="preparado">{{ ORDER_STATUS_LABELS.preparado }}</option>
+                <option value="recogido">{{ ORDER_STATUS_LABELS.recogido }}</option>
+                <option value="cancelado">{{ ORDER_STATUS_LABELS.cancelado }}</option>
               </select>
             </div>
             <button @click="loadOrders" class="flex items-center gap-2 md:ml-auto">
@@ -248,7 +248,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <template v-if="filterStatus === 'en_revision'">
-                  <span class="text-nowrap">En Revisión</span>
+                  <span class="text-nowrap">{{ ORDER_STATUS_LABELS.en_revision }}</span>
                 </template>
               </button>
 
@@ -266,7 +266,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
                 <template v-if="filterStatus === 'revisado'">
-                  <span>Revisado</span>
+                  <span>{{ ORDER_STATUS_LABELS.revisado }}</span>
                 </template>
               </button>
 
@@ -284,7 +284,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <template v-if="filterStatus === 'pedido'">
-                  <span>Pedido</span>
+                  <span>{{ ORDER_STATUS_LABELS.pedido }}</span>
                 </template>
               </button>
 
@@ -302,7 +302,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
                 <template v-if="filterStatus === 'preparado'">
-                  <span>Preparado</span>
+                  <span>{{ ORDER_STATUS_LABELS.preparado }}</span>
                 </template>
               </button>
 
@@ -320,7 +320,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <template v-if="filterStatus === 'recogido'">
-                  <span>Entregado</span>
+                  <span>{{ ORDER_STATUS_LABELS.recogido }}</span>
                 </template>
               </button>
 
@@ -367,12 +367,12 @@
                     <label class="text-xs md:text-sm font-semibold text-gray-700 whitespace-nowrap">Cambiar a:</label>
                     <select v-model="bulkStatusChange" class="select-field w-full md:w-auto text-sm">
                       <option value="">Seleccionar...</option>
-                      <option value="en_revision">En Revisión</option>
-                      <option value="revisado">Revisado</option>
-                      <option value="pedido">Pedido Realizado</option>
-                      <option value="preparado">Preparado</option>
-                      <option value="recogido">Recogido</option>
-                      <option value="cancelado">Cancelado</option>
+                      <option value="en_revision">{{ ORDER_STATUS_LABELS.en_revision }}</option>
+                      <option value="revisado">{{ ORDER_STATUS_LABELS.revisado }}</option>
+                      <option value="pedido">{{ ORDER_STATUS_LABELS.pedido }}</option>
+                      <option value="preparado">{{ ORDER_STATUS_LABELS.preparado }}</option>
+                      <option value="recogido">{{ ORDER_STATUS_LABELS.recogido }}</option>
+                      <option value="cancelado">{{ ORDER_STATUS_LABELS.cancelado }}</option>
                     </select>
                   </div>
                   <div class="flex gap-2">
@@ -670,7 +670,9 @@
             </div>
           </div>
         </div>
-
+        <div v-else-if="filteredOrders.length > 0">
+          <p class="text-gray-400 text-center py-6 text-sm">Has llegado al final de la lista</p>
+        </div>
         <!-- No hay pedidos -->
         <div v-else class="text-center py-12">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1293,7 +1295,7 @@ const bulkStatusChange = ref(''); // Estado seleccionado para cambio masivo
 
 // Paginación
 const currentPage = ref(1);
-const itemsPerPage = ref(3);
+const itemsPerPage = ref(10);
 
 // Estado de productos
 const products = ref<Product[]>([]);
@@ -1460,16 +1462,9 @@ const updateStatus = async (orderId: string, newStatus: string) => {
 };
 
 // Función para obtener la etiqueta del estado
+// Función para obtener la etiqueta del estado
 const getStatusLabel = (status: string) => {
-  const statusLabels: Record<string, string> = {
-    en_revision: 'En Revisión',
-    revisado: 'Revisado',
-    pedido: 'Pedido Realizado',
-    preparado: 'Preparado',
-    recogido: 'Recogido',
-    cancelado: 'Cancelado',
-  };
-  return statusLabels[status] || status;
+  return ORDER_STATUS_LABELS[status as OrderStatus] || status;
 };
 
 // Toggle selección de pedido
@@ -1557,16 +1552,8 @@ const exportToExcel = () => {
 
     // Recorrer todos los pedidos filtrados
     filteredOrders.value.forEach((order) => {
-      // Estados en español
-      const estadoMap: Record<string, string> = {
-        en_revision: 'En Revisión',
-        revisado: 'Revisado',
-        pedido: 'Pedido Realizado',
-        preparado: 'Preparado',
-        recogido: 'Recogido',
-        cancelado: 'Cancelado',
-      };
-      const estado = estadoMap[order.status || ''] || order.status || 'N/A';
+      // Obtener estado en español desde ORDER_STATUS_LABELS
+      const estado = ORDER_STATUS_LABELS[order.status as OrderStatus] || order.status || 'N/A';
 
       // Fecha formateada
       const fecha = order.created_at 
