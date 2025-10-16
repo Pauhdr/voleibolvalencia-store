@@ -269,7 +269,7 @@
           :class="{ 'pb-48 md:pb-0': selectedOrders.length > 0 }"
         >
           <div
-            v-for="order in filteredOrders"
+            v-for="order in paginatedOrders"
             :key="order.id"
             class="card overflow-hidden"
           >
@@ -445,6 +445,89 @@
                 </div>
               </div>
             </transition>
+          </div>
+        </div>
+
+        <!-- Paginación -->
+        <div v-if="filteredOrders.length > 0 && totalPages > 1" class="mt-6">
+          <div class="card p-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <!-- Información de la página -->
+              <div class="text-sm text-gray-600">
+                Mostrando 
+                <span class="font-semibold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
+                -
+                <span class="font-semibold">{{ Math.min(currentPage * itemsPerPage, filteredOrders.length) }}</span>
+                de
+                <span class="font-semibold">{{ filteredOrders.length }}</span>
+                pedidos
+              </div>
+
+              <!-- Controles de paginación -->
+              <div class="flex items-center gap-2">
+                <!-- Botón anterior -->
+                <button
+                  @click="currentPage = Math.max(1, currentPage - 1)"
+                  :disabled="currentPage === 1"
+                  class="px-3 py-2 rounded-lg border transition-colors"
+                  :class="currentPage === 1 
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <!-- Números de página -->
+                <div class="flex items-center gap-1">
+                  <button
+                    v-for="page in getPageNumbers()"
+                    :key="page"
+                    @click="typeof page === 'number' ? currentPage = page : null"
+                    :disabled="typeof page !== 'number'"
+                    class="min-w-[40px] px-3 py-2 rounded-lg border transition-colors text-sm font-medium"
+                    :class="page === currentPage
+                      ? 'bg-orange-600 text-white border-orange-600'
+                      : typeof page === 'number'
+                        ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        : 'bg-white text-gray-400 border-gray-200 cursor-default'"
+                  >
+                    {{ page }}
+                  </button>
+                </div>
+
+                <!-- Botón siguiente -->
+                <button
+                  @click="currentPage = Math.min(totalPages, currentPage + 1)"
+                  :disabled="currentPage === totalPages"
+                  class="px-3 py-2 rounded-lg border transition-colors"
+                  :class="currentPage === totalPages
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Selector de items por página -->
+              <div class="flex items-center gap-2 text-sm">
+                <label class="text-gray-600">Por página:</label>
+                <select 
+                  v-model="itemsPerPage" 
+                  @change="currentPage = 1"
+                  class="select-field py-1 text-sm"
+                >
+                  <option :value="5">5</option>
+                  <option :value="10">10</option>
+                  <option :value="20">20</option>
+                  <option :value="50">50</option>
+                  <option :value="100">100</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1068,6 +1151,10 @@ const expandedOrders = ref<string[]>([]); // IDs de pedidos expandidos
 const selectedOrders = ref<string[]>([]); // IDs de pedidos seleccionados
 const bulkStatusChange = ref(''); // Estado seleccionado para cambio masivo
 
+// Paginación
+const currentPage = ref(1);
+const itemsPerPage = ref(3);
+
 // Estado de productos
 const products = ref<Product[]>([]);
 const loadingProducts = ref(false);
@@ -1124,6 +1211,58 @@ const filteredOrders = computed(() => {
   if (!filterStatus.value) return orders.value;
   return orders.value.filter(o => o.status === filterStatus.value);
 });
+
+// Paginación de pedidos
+const totalPages = computed(() => Math.ceil(filteredOrders.value.length / itemsPerPage.value));
+
+const paginatedOrders = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredOrders.value.slice(start, end);
+});
+
+// Resetear página cuando cambia el filtro
+watch(filterStatus, () => {
+  currentPage.value = 1;
+});
+
+// Función para generar números de página con elipsis
+const getPageNumbers = () => {
+  const pages: (number | string)[] = [];
+  const total = totalPages.value;
+  const current = currentPage.value;
+
+  if (total <= 7) {
+    // Si hay 7 o menos páginas, mostrar todas
+    for (let i = 1; i <= total; i++) {
+      pages.push(i);
+    }
+  } else {
+    // Siempre mostrar primera página
+    pages.push(1);
+
+    if (current > 3) {
+      pages.push('...');
+    }
+
+    // Páginas alrededor de la actual
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (current < total - 2) {
+      pages.push('...');
+    }
+
+    // Siempre mostrar última página
+    pages.push(total);
+  }
+
+  return pages;
+};
 
 // Login
 const handleLogin = async () => {
