@@ -106,20 +106,15 @@
         <button
           type="button"
           @click="decrementQuantity"
-          class="w-10 h-10 rounded-lg bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-gray-700 transition-colors"
+          class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 transition-colors"
         >
           -
         </button>
-        <input
-          v-model.number="quantity"
-          type="number"
-          min="1"
-          class="w-20 text-center input-field"
-        />
+        <span class="w-8 text-center">{{ quantity }}</span>
         <button
           type="button"
           @click="incrementQuantity"
-          class="w-10 h-10 rounded-lg bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-gray-700 transition-colors"
+          class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-700 transition-colors"
         >
           +
         </button>
