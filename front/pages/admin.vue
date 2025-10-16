@@ -58,7 +58,7 @@
     <!-- Panel de administración -->
     <div v-else>
       <!-- Header -->
-      <header class="bg-white shadow-md">
+      <header class="bg-white">
         <div class="container-custom py-4 flex items-center justify-between">
           <div>
             <h1 class="text-2xl font-display font-bold text-gray-900">
@@ -111,14 +111,14 @@
         <!-- TAB: PEDIDOS -->
         <div v-if="activeTab === 'orders'">
           <!-- Estadísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div class="card p-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-8">
+          <div class="card px-6 py-4 relative">
             <div class="flex items-center justify-between">
               <div>
+                <p class="text-5xl font-bold text-gray-600">{{ pendingCount }}</p>
                 <p class="text-sm text-gray-600 mb-1">Pendientes</p>
-                <p class="text-3xl font-bold text-gray-600">{{ pendingCount }}</p>
               </div>
-              <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+              <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center absolute top-4 right-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -126,13 +126,13 @@
             </div>
           </div>
 
-          <div class="card p-6">
+          <div class="card px-6 py-4 relative">
             <div class="flex items-center justify-between">
               <div>
+                <p class="text-5xl font-bold text-yellow-600">{{ reviewedCount }}</p>
                 <p class="text-sm text-gray-600 mb-1">Revisados</p>
-                <p class="text-3xl font-bold text-yellow-600">{{ reviewedCount }}</p>
               </div>
-              <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center absolute top-4 right-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -140,39 +140,39 @@
             </div>
           </div>
 
-          <div class="card p-6">
+          <div class="card px-6 py-4 relative">
             <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm text-gray-600 mb-1">Preparados</p>
-                <p class="text-3xl font-bold text-blue-600">{{ preparedCount }}</p>
-              </div>
-              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center absolute top-4 right-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
+              <div class="flex items-start gap-2 flex-col">
+                <p class="text-5xl font-bold text-blue-600">{{ preparedCount }}</p>
+                <p class="text-sm text-gray-600 mb-1">Preparados</p>
+              </div>
             </div>
           </div>
 
-          <div class="card p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm text-gray-600 mb-1">Entregados</p>
-                <p class="text-3xl font-bold text-green-600">{{ deliveredCount }}</p>
-              </div>
-              <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+          <div class="card px-6 py-4 relative">
+            <div class="flex items-end justify-between h-full">
+              <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center absolute top-4 right-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
+              </div>
+              <div class="flex items-start gap-2 flex-col">
+                <p class="text-5xl font-bold text-green-600">{{ deliveredCount }}</p>
+                <p class="text-sm text-gray-600 mb-1">Entregados</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filtros y Acciones -->
         <div class="card p-4 mb-6">
           <div class="flex flex-wrap items-center gap-4">
-            <div>
+            <div class="flex flex-col items-start mr-auto">
               <label class="text-sm font-semibold text-gray-700 mr-2">Filtrar por estado:</label>
               <select v-model="filterStatus" class="select-field w-auto">
                 <option value="">Todos</option>
@@ -184,24 +184,77 @@
                 <option value="cancelado">Cancelado</option>
               </select>
             </div>
-            <button @click="loadOrders" class="btn-outline flex items-center gap-2">
+            <button @click="loadOrders" class="btn-outline flex items-center gap-2 md:ml-auto">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              Actualizar
+              
             </button>
             <button 
               @click="exportToExcel" 
-              class="btn-primary flex items-center gap-2 ml-auto"
+              class="btn-primary flex items-center gap-2 "
               :disabled="filteredOrders.length === 0"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Exportar a Excel ({{ filteredOrders.length }})
+              Excel
             </button>
           </div>
         </div>
+
+        <!-- Barra de acciones para pedidos seleccionados -->
+        <transition
+          enter-active-class="transition-all duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition-all duration-200 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-2"
+        >
+          <div v-if="selectedOrders.length > 0" class="fixed md:relative bottom-0 left-0 right-0 z-50 md:z-auto">
+            <div class="card p-4 mb-0 md:mb-6 bg-orange-50 border-2 border-orange-200 rounded-none md:rounded-lg shadow-lg md:shadow-sm">
+              <div class="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-3 md:gap-4">
+                <div class="flex items-center gap-2 justify-center md:justify-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="font-semibold text-gray-900 text-sm md:text-base">{{ selectedOrders.length }} pedido(s) seleccionado(s)</span>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-2 md:ml-auto">
+                  <div class="flex items-center gap-2">
+                    <label class="text-xs md:text-sm font-semibold text-gray-700 whitespace-nowrap">Cambiar a:</label>
+                    <select v-model="bulkStatusChange" class="select-field w-full md:w-auto text-sm">
+                      <option value="">Seleccionar...</option>
+                      <option value="en_revision">En Revisión</option>
+                      <option value="revisado">Revisado</option>
+                      <option value="pedido">Pedido Realizado</option>
+                      <option value="preparado">Preparado</option>
+                      <option value="recogido">Recogido</option>
+                      <option value="cancelado">Cancelado</option>
+                    </select>
+                  </div>
+                  <div class="flex gap-2">
+                    <button 
+                      @click="applyBulkStatusChange"
+                      :disabled="!bulkStatusChange"
+                      class="btn-primary flex-1 md:flex-initial text-sm"
+                    >
+                      Aplicar
+                    </button>
+                    <button 
+                      @click="clearSelection"
+                      class="btn-outline flex-1 md:flex-initial text-sm"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
 
         <!-- Loading -->
         <div v-if="loading" class="text-center py-12">
@@ -210,7 +263,11 @@
         </div>
 
         <!-- Lista de pedidos -->
-        <div v-else-if="filteredOrders.length > 0" class="space-y-3">
+        <div 
+          v-else-if="filteredOrders.length > 0" 
+          class="space-y-3"
+          :class="{ 'pb-48 md:pb-0': selectedOrders.length > 0 }"
+        >
           <div
             v-for="order in filteredOrders"
             :key="order.id"
@@ -218,11 +275,22 @@
           >
             <!-- Fila principal (siempre visible) -->
             <div 
-              class="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
-              @click="toggleOrderDetails(order.id!)"
+              class="p-4 flex items-center gap-4 transition-colors relative"
             >
+              <!-- Checkbox de selección -->
+              <input
+                type="checkbox"
+                :checked="selectedOrders.includes(order.id!)"
+                @change="toggleOrderSelection(order.id!)"
+                @click.stop
+                class="appearance-none w-5 h-5 border border-gray-200 checked:border-orange-500 rounded focus:ring-orange-500 checked:bg-orange-500 flex-shrink-0"
+              />
+
               <!-- Botón expandir/colapsar -->
-              <button class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+              <button 
+                @click="toggleOrderDetails(order.id!)"
+                class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
                   class="h-5 w-5 transition-transform duration-200"
@@ -236,15 +304,15 @@
               </button>
 
               <!-- Información principal -->
-              <div class="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+              <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
                 <!-- Nombre jugador -->
                 <div class="min-w-0">
-                  <p class="font-semibold text-gray-900 truncate">{{ order.player_name }}</p>
+                  <p class="text-sm md:text-md font-semibold text-gray-900 truncate">{{ order.player_name }}</p>
                   <p class="text-sm text-gray-500 truncate">{{ order.team }}</p>
                 </div>
 
                 <!-- Email -->
-                <div class="min-w-0">
+                <div class="min-w-0 hidden md:block">
                   <p class="text-sm text-gray-600 truncate">{{ order.email }}</p>
                   <p class="text-xs text-gray-400">
                     {{ order.created ? new Date(order.created).toLocaleDateString('es-ES') : 'N/A' }}
@@ -252,34 +320,26 @@
                 </div>
 
                 <!-- Total -->
-                <div class="min-w-0">
+                <div class="min-w-0 hidden md:block">
                   <p class="font-bold text-orange-600">{{ order.total?.toFixed(2) }}€</p>
-                  <p class="text-xs text-gray-500">{{ order.items?.length || 0 }} producto(s)</p>
+                  <p class="text-xs text-gray-500 hidden md:block">{{ order.items?.length || 0 }} producto(s)</p>
                 </div>
 
-                <!-- Estado (selector) -->
-                <div class="min-w-0 flex items-center gap-2">
-                  <select
-                    :value="order.status"
-                    @change="updateStatus(order.id!, ($event.target as HTMLSelectElement).value)"
-                    @click.stop
-                    class="select-field text-sm py-1.5 w-full"
+                <!-- Estado (badge) -->
+                <div class="min-w-0 flex items-center gap-2 absolute right-4 top-4">
+                  <span
+                    class="inline-flex items-center px-3 py-1.5 rounded-full text-[0.65rem] font-semibold"
                     :class="{
-                      'bg-yellow-50 border-yellow-300 text-yellow-800': order.status === 'en_revision',
-                      'bg-blue-50 border-blue-300 text-blue-800': order.status === 'revisado',
-                      'bg-purple-50 border-purple-300 text-purple-800': order.status === 'pedido',
-                      'bg-green-50 border-green-300 text-green-800': order.status === 'preparado',
-                      'bg-gray-50 border-gray-300 text-gray-800': order.status === 'recogido',
-                      'bg-red-50 border-red-300 text-red-800': order.status === 'cancelado'
+                      'bg-gray-100 text-gray-800': order.status === 'en_revision',
+                      'bg-yellow-100 text-yellow-800': order.status === 'revisado',
+                      'bg-purple-100 text-purple-800': order.status === 'pedido',
+                      'bg-blue-100 text-blue-800': order.status === 'preparado',
+                      'bg-green-100 text-green-800': order.status === 'recogido',
+                      'bg-red-100 text-red-800': order.status === 'cancelado'
                     }"
                   >
-                    <option value="en_revision">En Revisión</option>
-                    <option value="revisado">Revisado</option>
-                    <option value="pedido">Pedido Realizado</option>
-                    <option value="preparado">Preparado</option>
-                    <option value="recogido">Recogido</option>
-                    <option value="cancelado">Cancelado</option>
-                  </select>
+                    {{ getStatusLabel(order.status) }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -293,7 +353,7 @@
               leave-from-class="opacity-100 max-h-[2000px]"
               leave-to-class="opacity-0 max-h-0"
             >
-              <div v-if="expandedOrders.includes(order.id!)" class="border-t border-gray-200 bg-gray-50">
+              <div v-if="expandedOrders.includes(order.id!)" class="border-t border-gray-200 bg-white">
                 <div class="p-6 space-y-6">
                   <!-- Información del pedido -->
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1005,6 +1065,8 @@ const orders = ref<Order[]>([]);
 const loading = ref(false);
 const filterStatus = ref('');
 const expandedOrders = ref<string[]>([]); // IDs de pedidos expandidos
+const selectedOrders = ref<string[]>([]); // IDs de pedidos seleccionados
+const bulkStatusChange = ref(''); // Estado seleccionado para cambio masivo
 
 // Estado de productos
 const products = ref<Product[]>([]);
@@ -1116,6 +1178,72 @@ const updateStatus = async (orderId: string, newStatus: string) => {
   } else {
     alert('Error al actualizar el estado del pedido');
   }
+};
+
+// Función para obtener la etiqueta del estado
+const getStatusLabel = (status: string) => {
+  const statusLabels: Record<string, string> = {
+    en_revision: 'En Revisión',
+    revisado: 'Revisado',
+    pedido: 'Pedido Realizado',
+    preparado: 'Preparado',
+    recogido: 'Recogido',
+    cancelado: 'Cancelado',
+  };
+  return statusLabels[status] || status;
+};
+
+// Toggle selección de pedido
+const toggleOrderSelection = (orderId: string) => {
+  const index = selectedOrders.value.indexOf(orderId);
+  if (index > -1) {
+    selectedOrders.value.splice(index, 1);
+  } else {
+    selectedOrders.value.push(orderId);
+  }
+};
+
+// Limpiar selección
+const clearSelection = () => {
+  selectedOrders.value = [];
+  bulkStatusChange.value = '';
+};
+
+// Aplicar cambio de estado masivo
+const applyBulkStatusChange = async () => {
+  if (!bulkStatusChange.value || selectedOrders.value.length === 0) {
+    return;
+  }
+
+  const confirmMsg = `¿Estás seguro de que quieres cambiar el estado de ${selectedOrders.value.length} pedido(s) a "${getStatusLabel(bulkStatusChange.value)}"?`;
+  
+  if (!confirm(confirmMsg)) {
+    return;
+  }
+
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (const orderId of selectedOrders.value) {
+    const success = await updateOrderStatus(orderId, bulkStatusChange.value);
+    if (success) {
+      const order = orders.value.find(o => o.id === orderId);
+      if (order) {
+        order.status = bulkStatusChange.value as any;
+      }
+      successCount++;
+    } else {
+      errorCount++;
+    }
+  }
+
+  if (errorCount === 0) {
+    alert(`Se actualizaron correctamente ${successCount} pedido(s)`);
+  } else {
+    alert(`Se actualizaron ${successCount} pedido(s). ${errorCount} fallaron.`);
+  }
+
+  clearSelection();
 };
 
 // Ver comprobante

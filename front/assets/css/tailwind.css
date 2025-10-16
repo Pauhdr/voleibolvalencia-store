@@ -33,7 +33,7 @@
   
   /* Cards */
   .card {
-    @apply bg-white rounded-xl shadow-md overflow-hidden;
+    @apply bg-white rounded-xl overflow-hidden;
   }
   
   /* Container */
