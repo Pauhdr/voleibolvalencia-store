@@ -1985,6 +1985,14 @@ const openProductModal = (product?: Product) => {
       },
     };
     imagePreview.value = product.image || '';
+    
+    // Debug: Ver qué se cargó para editar
+    console.log('📝 Producto cargado para editar:', {
+      name: product.name,
+      size_chart_enabled: productForm.value.size_chart.enabled,
+      size_chart_hasSeparateGenders: productForm.value.size_chart.hasSeparateGenders,
+      size_chart: productForm.value.size_chart
+    });
   } else {
     // Nuevo producto
     editingProduct.value = null;
@@ -2155,6 +2163,30 @@ const saveProduct = async () => {
   savingProduct.value = true;
 
   try {
+    // Preparar size_chart según el tipo
+    let sizeChartData = null;
+    if (productForm.value.size_chart.enabled) {
+      if (productForm.value.size_chart.hasSeparateGenders) {
+        // Tablas separadas: guardar boys y girls, NO columns/rows
+        sizeChartData = {
+          enabled: true,
+          unit: productForm.value.size_chart.unit,
+          hasSeparateGenders: true,
+          boys: productForm.value.size_chart.boys,
+          girls: productForm.value.size_chart.girls,
+        };
+      } else {
+        // Tabla única: guardar columns y rows, NO boys/girls
+        sizeChartData = {
+          enabled: true,
+          unit: productForm.value.size_chart.unit,
+          hasSeparateGenders: false,
+          columns: productForm.value.size_chart.columns,
+          rows: productForm.value.size_chart.rows,
+        };
+      }
+    }
+
     // Preparar los datos del producto
     const productData: any = {
       name: productForm.value.name,
@@ -2169,8 +2201,16 @@ const saveProduct = async () => {
         tallas: productForm.value.options.hasTalla ? productForm.value.options.tallas : [],
         generos: productForm.value.options.hasGenero ? productForm.value.options.generos : [],
       },
-      size_chart: productForm.value.size_chart.enabled ? productForm.value.size_chart : null,
+      size_chart: sizeChartData,
     };
+
+    // Debug: Ver qué se va a guardar
+    console.log('💾 Guardando producto:', {
+      name: productData.name,
+      size_chart_enabled: sizeChartData?.enabled,
+      size_chart_hasSeparateGenders: sizeChartData?.hasSeparateGenders,
+      size_chart: sizeChartData
+    });
 
     // Si hay una imagen nueva seleccionada, subirla primero
     if (selectedImageFile.value) {

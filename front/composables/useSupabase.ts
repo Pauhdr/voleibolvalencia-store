@@ -93,7 +93,12 @@ export const useSupabase = () => {
         product.image = urlData.publicUrl
       }
       
-      console.log('✅ Producto cargado:', product)
+      console.log('✅ Producto cargado desde BD:', {
+        name: product.name,
+        size_chart_enabled: product.size_chart?.enabled,
+        size_chart_hasSeparateGenders: product.size_chart?.hasSeparateGenders,
+        size_chart: product.size_chart
+      });
       return product
     } catch (error) {
       console.error('❌ Error fetching product:', error)
@@ -281,6 +286,7 @@ export const useSupabase = () => {
   // Crear producto
   const createProduct = async (productData: any): Promise<boolean> => {
     try {
+      console.log('💾 Guardando producto en BD:', productData);
       const { error } = await supabase
         .from('products')
         .insert({
@@ -290,6 +296,7 @@ export const useSupabase = () => {
           category: productData.category,
           image_path: productData.image_path || null,
           options: productData.options,
+          size_chart: productData.size_chart || null,
           active: true,
         })
       
@@ -298,6 +305,7 @@ export const useSupabase = () => {
         return false
       }
       
+      console.log('✅ Producto creado exitosamente');
       return true
     } catch (error) {
       console.error('❌ Error creating product:', error)
@@ -308,6 +316,7 @@ export const useSupabase = () => {
   // Actualizar producto
   const updateProduct = async (productId: string, productData: any): Promise<boolean> => {
     try {
+      console.log('💾 Actualizando producto en BD:', productData);
       const { error } = await supabase
         .from('products')
         .update({
@@ -317,6 +326,7 @@ export const useSupabase = () => {
           category: productData.category,
           image_path: productData.image_path || null,
           options: productData.options,
+          size_chart: productData.size_chart || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', productId)
@@ -326,6 +336,7 @@ export const useSupabase = () => {
         return false
       }
       
+      console.log('✅ Producto actualizado exitosamente');
       return true
     } catch (error) {
       console.error('❌ Error updating product:', error)
