@@ -29,7 +29,7 @@
         <!-- Columna izquierda - Imagen -->
         <div class="space-y-6">
           <div class="card overflow-hidden justify-center max-w-[600px] max-h-[600px] mx-auto">
-            <div class="aspect-square bg-gray-100 flex items-center ">
+            <div class="aspect-square bg-gray-100 flex justify-center items-center">
               <img
                 v-if="product.image"
                 :src="product.image"
