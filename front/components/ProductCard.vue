@@ -5,7 +5,7 @@
   >
     <article class="relative overflow-hidden">
       <!-- Imagen del producto -->
-      <div class="aspect-square overflow-hidden bg-gray-100">
+      <div class="aspect-square overflow-hidden bg-gray-100 rounded-2xl">
         <img
           v-if="product.image"
           :src="product.image"
