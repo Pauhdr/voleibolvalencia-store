@@ -129,12 +129,11 @@
               <!-- Nombre del padre/madre -->
               <div class="md:col-span-2">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  Nombre del Padre/Madre <span class="text-red-500">*</span>
+                  Nombre del Padre/Madre <span class="text-gray-400 text-xs">(opcional)</span>
                 </label>
                 <input
                   v-model="formData.parent_name"
                   type="text"
-                  required
                   class="input-field"
                   placeholder="Ej: Juan García López"
                 />
@@ -397,7 +396,6 @@ const isFormValid = computed(() => {
   return (
     formData.value.player_name &&
     formData.value.team &&
-    formData.value.parent_name &&
     formData.value.email &&
     selectedFile.value !== null
   );
