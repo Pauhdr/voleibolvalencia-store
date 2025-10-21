@@ -575,17 +575,40 @@
                     </div>
                   </div>
 
-                  <!-- Botón ver comprobante -->
-                  <div v-if="order.proof" class="flex justify-end">
-                    <button
-                      @click="viewProof(order)"
-                      class="btn-outline text-sm flex items-center gap-2"
-                    >
+                  <!-- Justificante de Pago -->
+                  <div v-if="order.payment_proof">
+                    <!-- <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      Ver Comprobante de Pago
-                    </button>
+                      Justificante de Pago
+                    </h4> -->
+                    <!-- <div class="p-4"> -->
+                      <button
+                        @click="viewProof(order)"
+                        class="btn-outline text-sm flex items-center gap-2"
+                        title="Ver justificante de pago"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Ver Justificante
+                      </button>
+                    <!-- </div> -->
+                  </div>
+
+                  <!-- Mensaje si no hay justificante -->
+                  <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <div>
+                        <p class="text-sm font-medium text-yellow-800">No hay justificante de pago</p>
+                        <p class="text-xs text-yellow-700 mt-1">El cliente no ha subido el justificante de pago para este pedido.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1367,6 +1390,80 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal del Justificante de Pago -->
+  <div
+    v-if="showProofModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    @click="closeProofModal"
+  >
+    <div
+      class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto"
+      @click.stop
+    >
+      <!-- Header -->
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Justificante de Pago
+        </h3>
+        <button
+          @click="closeProofModal"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+          title="Cerrar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6">
+        <!-- PDF Viewer -->
+        <div v-if="currentProofType === 'pdf'" class="w-full">
+          <iframe
+            :src="currentProofUrl"
+            class="w-full h-[70vh] border border-gray-300 rounded-lg"
+            title="Justificante de pago PDF"
+          />
+        </div>
+
+        <!-- Image Viewer -->
+        <div v-else class="flex justify-center">
+          <img
+            :src="currentProofUrl"
+            alt="Justificante de pago"
+            class="max-w-full h-auto rounded-lg shadow-lg"
+            @error="(e) => (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect width=%22400%22 height=%22300%22 fill=%22%23f3f4f6%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22sans-serif%22 font-size=%2218%22 fill=%22%23999%22>Error al cargar la imagen</text></svg>'"
+          />
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+        <a
+          :href="currentProofUrl"
+          target="_blank"
+          class="btn-outline text-sm flex items-center gap-2"
+          title="Abrir en nueva pestaña"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Abrir en Nueva Pestaña
+        </a>
+        <button
+          @click="closeProofModal"
+          class="btn-primary text-sm"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -1401,6 +1498,11 @@ const filterStatus = ref('');
 const expandedOrders = ref<string[]>([]); // IDs de pedidos expandidos
 const selectedOrders = ref<string[]>([]); // IDs de pedidos seleccionados
 const bulkStatusChange = ref(''); // Estado seleccionado para cambio masivo
+
+// Modal del justificante de pago
+const showProofModal = ref(false);
+const currentProofUrl = ref('');
+const currentProofType = ref(''); // 'image' o 'pdf'
 
 // Paginación
 const currentPage = ref(1);
@@ -1693,12 +1795,34 @@ const applyBulkStatusChange = async () => {
   clearSelection();
 };
 
+// Detectar si el archivo es PDF
+const isPDF = (url: string | undefined): boolean => {
+  if (!url) return false;
+  return url.toLowerCase().includes('.pdf') || url.toLowerCase().includes('application/pdf');
+};
+
+// Obtener extensión del archivo
+const getFileExtension = (url: string | undefined): string => {
+  if (!url) return 'jpg';
+  const match = url.match(/\.([a-zA-Z0-9]+)(\?|$)/);
+  return match ? match[1] : 'jpg';
+};
+
 // Ver comprobante
 const viewProof = (order: Order) => {
-  if (order.payment_proof && order.id) {
-    const url = getFileUrl(order, order.payment_proof as string);
-    window.open(url, '_blank');
+  const proofUrl = order.payment_proof;
+  if (proofUrl) {
+    currentProofUrl.value = proofUrl as string;
+    currentProofType.value = isPDF(proofUrl as string) ? 'pdf' : 'image';
+    showProofModal.value = true;
   }
+};
+
+// Cerrar modal del justificante
+const closeProofModal = () => {
+  showProofModal.value = false;
+  currentProofUrl.value = '';
+  currentProofType.value = '';
 };
 
 // Exportar pedidos a Excel
