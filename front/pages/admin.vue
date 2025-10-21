@@ -1581,6 +1581,106 @@ const selectedImageFile = ref<File | null>(null);
 // Tallas disponibles
 const availableSizes = ['4XS', '3XS', '2XS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
 
+// Función para ordenar tallas según el orden de availableSizes
+const sortSizes = (sizes: string[]): string[] => {
+  return sizes.sort((a, b) => {
+    const indexA = availableSizes.indexOf(a);
+    const indexB = availableSizes.indexOf(b);
+    
+    // Si ambas están en availableSizes, ordenar por su índice
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB;
+    }
+    
+    // Si solo una está en availableSizes, la que está va primero
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    
+    // Si ninguna está, orden alfabético
+    return a.localeCompare(b);
+  });
+};
+
+// Función para sincronizar tallas de la tabla con las seleccionadas
+const syncSizeChartWithSelectedSizes = () => {
+  if (!productForm.value.size_chart.enabled || !productForm.value.options.hasTalla) {
+    return;
+  }
+
+  const selectedSizes = productForm.value.options.tallas;
+  
+  if (productForm.value.size_chart.hasSeparateGenders) {
+    // Para tablas separadas por género
+    ['boys', 'girls'].forEach((gender) => {
+      const genderKey = gender as 'boys' | 'girls';
+      const currentRows = productForm.value.size_chart[genderKey]!.rows;
+      const currentSizes = currentRows.map(row => row.size);
+      
+      // Eliminar filas de tallas que ya no están seleccionadas
+      productForm.value.size_chart[genderKey]!.rows = currentRows.filter(row => 
+        selectedSizes.includes(row.size)
+      );
+      
+      // Añadir filas para tallas nuevas
+      selectedSizes.forEach(size => {
+        if (!currentSizes.includes(size)) {
+          const measurements: Record<string, string> = {};
+          productForm.value.size_chart[genderKey]!.columns.forEach(column => {
+            measurements[column.id] = '';
+          });
+          productForm.value.size_chart[genderKey]!.rows.push({
+            size,
+            measurements,
+          });
+        }
+      });
+      
+      // Ordenar filas por talla
+      productForm.value.size_chart[genderKey]!.rows.sort((a, b) => {
+        const indexA = availableSizes.indexOf(a.size);
+        const indexB = availableSizes.indexOf(b.size);
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        return a.size.localeCompare(b.size);
+      });
+    });
+  } else {
+    // Para tabla única
+    const currentRows = productForm.value.size_chart.rows;
+    const currentSizes = currentRows.map(row => row.size);
+    
+    // Eliminar filas de tallas que ya no están seleccionadas
+    productForm.value.size_chart.rows = currentRows.filter(row => 
+      selectedSizes.includes(row.size)
+    );
+    
+    // Añadir filas para tallas nuevas
+    selectedSizes.forEach(size => {
+      if (!currentSizes.includes(size)) {
+        const measurements: Record<string, string> = {};
+        productForm.value.size_chart.columns.forEach(column => {
+          measurements[column.id] = '';
+        });
+        productForm.value.size_chart.rows.push({
+          size,
+          measurements,
+        });
+      }
+    });
+    
+    // Ordenar filas por talla
+    productForm.value.size_chart.rows.sort((a, b) => {
+      const indexA = availableSizes.indexOf(a.size);
+      const indexB = availableSizes.indexOf(b.size);
+      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+      return a.size.localeCompare(b.size);
+    });
+  }
+};
+
 // Formulario de producto
 const productForm = ref({
   name: '',
@@ -1650,6 +1750,19 @@ watch(() => productForm.value.size_chart.hasSeparateGenders, (newValue) => {
     if (!productForm.value.size_chart.girls) {
       productForm.value.size_chart.girls = { columns: [], rows: [] };
     }
+  }
+});
+
+// Watcher para sincronizar tallas de la tabla cuando cambian las tallas seleccionadas
+watch(() => productForm.value.options.tallas, () => {
+  syncSizeChartWithSelectedSizes();
+}, { deep: true });
+
+// Watcher para habilitar/deshabilitar la tabla de tallas cuando se activa/desactiva
+watch(() => productForm.value.size_chart.enabled, (newValue) => {
+  if (newValue && productForm.value.options.hasTalla) {
+    // Si se habilita la tabla y hay tallas seleccionadas, sincronizar
+    syncSizeChartWithSelectedSizes();
   }
 });
 
@@ -2163,6 +2276,16 @@ const saveProduct = async () => {
   savingProduct.value = true;
 
   try {
+    // Ordenar tallas antes de guardar
+    if (productForm.value.options.hasTalla && productForm.value.options.tallas.length > 0) {
+      productForm.value.options.tallas = sortSizes(productForm.value.options.tallas);
+    }
+
+    // Sincronizar y ordenar tallas en la tabla de tallas
+    if (productForm.value.size_chart.enabled) {
+      syncSizeChartWithSelectedSizes();
+    }
+
     // Preparar size_chart según el tipo
     let sizeChartData = null;
     if (productForm.value.size_chart.enabled) {
