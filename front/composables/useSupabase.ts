@@ -53,10 +53,10 @@ export const useSupabase = () => {
           if (product.size_chart.image_path) {
             const { data: urlData } = supabase.storage
               .from('products')
-              .getPublicUrl(product.size_chart.image)
+              .getPublicUrl(product.size_chart.image_path)
             product.size_chart.image = urlData.publicUrl
           }
-          if (product.size_chart.boys_image) {
+          if (product.size_chart.boys_image_path) {
             const { data: urlData } = supabase.storage
               .from('products')
               .getPublicUrl(product.size_chart.boys_image_path)
@@ -68,6 +68,21 @@ export const useSupabase = () => {
               .getPublicUrl(product.size_chart.girls_image_path)
             product.size_chart.girls_image = urlData.publicUrl
           }
+        }
+
+        // Generar URLs públicas para las imágenes adicionales
+        if (record.images && Array.isArray(record.images)) {
+          product.images = record.images.map((img: any) => {
+            const { data: urlData } = supabase.storage
+              .from('products')
+              .getPublicUrl(img.path)
+            return {
+              id: img.id,
+              url: urlData.publicUrl,
+              path: img.path,
+              order: img.order
+            }
+          })
         }
         
         return product
@@ -135,6 +150,21 @@ export const useSupabase = () => {
             .getPublicUrl(product.size_chart.girls_image_path)
           product.size_chart.girls_image = urlData.publicUrl
         }
+      }
+
+      // Generar URLs públicas para las imágenes adicionales
+      if (data.images && Array.isArray(data.images)) {
+        product.images = data.images.map((img: any) => {
+          const { data: urlData } = supabase.storage
+            .from('products')
+            .getPublicUrl(img.path)
+          return {
+            id: img.id,
+            url: urlData.publicUrl,
+            path: img.path,
+            order: img.order
+          }
+        })
       }
       
       console.log('✅ Producto cargado desde BD:', product);
@@ -349,6 +379,21 @@ export const useSupabase = () => {
         }
       }
 
+      // Si hay imágenes adicionales, generar URLs públicas
+      if (productData.images && Array.isArray(productData.images)) {
+        productData.images = productData.images.map((img: any) => {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(img.path);
+          return {
+            id: img.id,
+            url: data.publicUrl,
+            path: img.path,
+            order: img.order
+          };
+        });
+      }
+
       const { error } = await supabase
         .from('products')
         .insert({
@@ -357,6 +402,7 @@ export const useSupabase = () => {
           price: productData.price,
           category: productData.category,
           image_path: productData.image_path || null,
+          images: productData.images || null,
           options: productData.options,
           size_chart: productData.size_chart || null,
           active: true,
@@ -402,6 +448,21 @@ export const useSupabase = () => {
         }
       }
 
+      // Si hay imágenes adicionales, generar URLs públicas
+      if (productData.images && Array.isArray(productData.images)) {
+        productData.images = productData.images.map((img: any) => {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(img.path);
+          return {
+            id: img.id,
+            url: data.publicUrl,
+            path: img.path,
+            order: img.order
+          };
+        });
+      }
+
       const { error } = await supabase
         .from('products')
         .update({
@@ -410,6 +471,7 @@ export const useSupabase = () => {
           price: productData.price,
           category: productData.category,
           image_path: productData.image_path || null,
+          images: productData.images || null,
           options: productData.options,
           size_chart: productData.size_chart || null,
           updated_at: new Date().toISOString(),

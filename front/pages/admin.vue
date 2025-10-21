@@ -882,6 +882,92 @@
                   />
                 </div>
               </div>
+
+              <!-- Galería de Imágenes Adicionales -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Galería de Imágenes (Opcional)
+                </label>
+                <p class="text-xs text-gray-500 mb-3">
+                  Añade imágenes adicionales para mostrar en el carrusel del producto
+                </p>
+                
+                <!-- Botón para añadir imagen -->
+                <input
+                  ref="additionalImageInput"
+                  type="file"
+                  accept="image/*"
+                  @change="handleAdditionalImageUpload"
+                  class="hidden"
+                />
+                <button
+                  type="button"
+                  @click="$refs.additionalImageInput.click()"
+                  class="btn-outline text-sm flex items-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Añadir Imagen
+                </button>
+
+                <!-- Lista de imágenes adicionales -->
+                <div v-if="additionalImages.length > 0" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  <div
+                    v-for="(img, index) in additionalImages"
+                    :key="index"
+                    class="relative group"
+                  >
+                    <img
+                      :src="img.preview || img.url"
+                      :alt="`Imagen ${index + 1}`"
+                      class="w-full h-32 object-cover rounded-lg border border-gray-300"
+                    />
+                    <!-- Botones de acción -->
+                    <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      <!-- Mover a la izquierda -->
+                      <button
+                        v-if="index > 0"
+                        type="button"
+                        @click="moveImage(index, 'left')"
+                        class="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                        title="Mover a la izquierda"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <!-- Mover a la derecha -->
+                      <button
+                        v-if="index < additionalImages.length - 1"
+                        type="button"
+                        @click="moveImage(index, 'right')"
+                        class="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                        title="Mover a la derecha"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                      <!-- Eliminar -->
+                      <button
+                        type="button"
+                        @click="removeAdditionalImage(index)"
+                        class="p-2 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+                        title="Eliminar imagen"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                    <!-- Indicador de orden -->
+                    <div class="absolute top-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+                      #{{ index + 1 }}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Opciones del producto -->
@@ -1323,6 +1409,16 @@ const editingProduct = ref<Product | null>(null);
 const savingProduct = ref(false);
 const imagePreview = ref<string>('');
 const selectedImageFile = ref<File | null>(null);
+
+// Imágenes adicionales (galería)
+const additionalImages = ref<Array<{
+  id: string;
+  file?: File;
+  preview?: string;
+  url?: string;
+  path?: string;
+  order: number;
+}>>([]);
 
 // Imágenes de tabla de tallas
 const sizeChartImagePreview = ref<string>('');
@@ -1859,6 +1955,16 @@ const openProductModal = (product?: Product) => {
     };
     imagePreview.value = product.image || '';
     
+    // Cargar imágenes adicionales existentes
+    if (product.images && Array.isArray(product.images)) {
+      additionalImages.value = product.images.map(img => ({
+        id: img.id,
+        url: img.url,
+        path: img.path,
+        order: img.order
+      }));
+    }
+    
     // Cargar previews de imágenes de tablas de tallas
     if (product.size_chart?.image) {
       sizeChartImagePreview.value = product.size_chart.image;
@@ -1875,7 +1981,8 @@ const openProductModal = (product?: Product) => {
       name: product.name,
       size_chart_enabled: productForm.value.size_chart.enabled,
       size_chart_hasSeparateGenders: productForm.value.size_chart.hasSeparateGenders,
-      size_chart: productForm.value.size_chart
+      size_chart: productForm.value.size_chart,
+      images_count: additionalImages.value.length
     });
   } else {
     // Nuevo producto
@@ -1892,6 +1999,13 @@ const closeProductModal = () => {
   resetProductForm();
   imagePreview.value = '';
   selectedImageFile.value = null;
+  additionalImages.value = [];
+  sizeChartImagePreview.value = '';
+  sizeChartImageFile.value = null;
+  sizeChartBoysImagePreview.value = '';
+  sizeChartBoysImageFile.value = null;
+  sizeChartGirlsImagePreview.value = '';
+  sizeChartGirlsImageFile.value = null;
 };
 
 // Resetear formulario
@@ -2063,6 +2177,60 @@ const removeSizeChartGirlsImage = () => {
   productForm.value.size_chart.girls_image_path = '';
 };
 
+// ============ FUNCIONES DE GALERÍA DE IMÁGENES ADICIONALES ============
+const handleAdditionalImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen es demasiado grande. Máximo 5MB.');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona una imagen válida.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      additionalImages.value.push({
+        id: `temp-${Date.now()}-${Math.random()}`,
+        file: file,
+        preview: e.target?.result as string,
+        order: additionalImages.value.length
+      });
+    };
+    reader.readAsDataURL(file);
+    
+    // Limpiar el input para poder subir la misma imagen de nuevo si es necesario
+    target.value = '';
+  }
+};
+
+const removeAdditionalImage = (index: number) => {
+  additionalImages.value.splice(index, 1);
+  // Reordenar los índices
+  additionalImages.value.forEach((img, idx) => {
+    img.order = idx;
+  });
+};
+
+const moveImage = (index: number, direction: 'left' | 'right') => {
+  const newIndex = direction === 'left' ? index - 1 : index + 1;
+  if (newIndex < 0 || newIndex >= additionalImages.value.length) return;
+  
+  // Intercambiar posiciones
+  const temp = additionalImages.value[index];
+  additionalImages.value[index] = additionalImages.value[newIndex];
+  additionalImages.value[newIndex] = temp;
+  
+  // Actualizar órdenes
+  additionalImages.value[index].order = index;
+  additionalImages.value[newIndex].order = newIndex;
+};
+// ============ FIN FUNCIONES GALERÍA ============
+
 // ============ FUNCIONES OBSOLETAS DE TABLA DE TALLAS (YA NO SE USAN) ============
 // Las funciones de gestión de tablas dinámicas han sido eliminadas
 // Ahora se usan imágenes estáticas subidas por el administrador
@@ -2178,6 +2346,35 @@ const saveProduct = async () => {
       // Mantener la imagen existente
       productData.image_path = editingProduct.value.image_path;
     }
+
+    // Subir imágenes adicionales (galería)
+    const uploadedImages: any[] = [];
+    for (const img of additionalImages.value) {
+      if (img.file) {
+        // Es una imagen nueva que necesita ser subida
+        console.log('Subiendo imagen adicional...', img.file.name);
+        const imagePath = await uploadProductImage(img.file, 'gallery');
+        if (imagePath) {
+          uploadedImages.push({
+            id: img.id,
+            path: imagePath,
+            order: img.order
+          });
+        } else {
+          alert('Error al subir una de las imágenes adicionales');
+          savingProduct.value = false;
+          return;
+        }
+      } else if (img.path) {
+        // Es una imagen existente, mantenerla
+        uploadedImages.push({
+          id: img.id,
+          path: img.path,
+          order: img.order
+        });
+      }
+    }
+    productData.images = uploadedImages;
 
     let success = false;
 

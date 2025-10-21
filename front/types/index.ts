@@ -5,11 +5,19 @@ export interface Product {
   name: string;
   price: number;
   description?: string;
-  image?: string;          // URL pública de la imagen (generada desde image_path)
-  image_path?: string;     // Path del archivo en Supabase Storage
+  image?: string;          // URL pública de la imagen principal (generada desde image_path)
+  image_path?: string;     // Path del archivo principal en Supabase Storage
+  images?: ProductImage[]; // Array de imágenes adicionales
   options: ProductOptions;
   category?: string;
   size_chart?: SizeChart;  // Tabla de tallas personalizada (opcional)
+}
+
+export interface ProductImage {
+  id: string;              // ID único de la imagen
+  url: string;             // URL pública de la imagen
+  path: string;            // Path del archivo en Supabase Storage
+  order: number;           // Orden de visualización
 }
 
 export interface ProductOptions {

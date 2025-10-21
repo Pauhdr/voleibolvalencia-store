@@ -26,13 +26,14 @@
       </nav>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 h-full">
-        <!-- Columna izquierda - Imagen -->
-        <div class="space-y-6">
-          <div class="card overflow-hidden justify-center max-w-[600px] max-h-[600px] mx-auto">
+        <!-- Columna izquierda - Galería de Imágenes -->
+        <div class="space-y-4">
+          <!-- Imagen principal -->
+          <div class="card overflow-hidden justify-center max-w-[600px] max-h-[600px] mx-auto relative group">
             <div class="aspect-square bg-gray-100 flex justify-center items-center">
               <img
-                v-if="product.image"
-                :src="product.image"
+                v-if="currentImage"
+                :src="currentImage"
                 :alt="product.name"
                 class="w-full h-full object-cover"
               />
@@ -43,6 +44,60 @@
                 <p class="text-gray-500">Sin imagen</p>
               </div>
             </div>
+
+            <!-- Botones de navegación (solo si hay múltiples imágenes) -->
+            <template v-if="allImages.length > 1">
+              <button
+                v-if="currentImageIndex > 0"
+                @click="previousImage"
+                class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                v-if="currentImageIndex < allImages.length - 1"
+                @click="nextImage"
+                class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <!-- Indicador de posición -->
+              <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                <button
+                  v-for="(img, index) in allImages"
+                  :key="index"
+                  @click="currentImageIndex = index"
+                  :class="[
+                    'w-2 h-2 rounded-full transition-all',
+                    index === currentImageIndex ? 'bg-orange-600 w-8' : 'bg-white/70 hover:bg-white'
+                  ]"
+                />
+              </div>
+            </template>
+          </div>
+
+          <!-- Miniaturas (solo si hay múltiples imágenes) -->
+          <div v-if="allImages.length > 1" class="flex overflow-x-auto gap-2 justify-center">
+            <button
+              v-for="(img, index) in allImages"
+              :key="index"
+              @click="currentImageIndex = index"
+              :class="[
+                'aspect-square rounded-lg overflow-hidden border-2 transition-all w-20',
+                index === currentImageIndex ? 'border-orange-600 ring-2 ring-orange-200' : 'border-gray-200 hover:border-gray-400'
+              ]"
+            >
+              <img
+                :src="img"
+                :alt="`${product.name} - Imagen ${index + 1}`"
+                class="w-full h-full object-cover"
+              />
+            </button>
           </div>
         </div>
 
@@ -111,7 +166,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Product } from '~/types';
 import { useSupabase } from '~/composables/useSupabase';
@@ -124,6 +179,42 @@ const product = ref<Product | null>(null);
 const loading = ref(true);
 const error = ref('');
 const showSizeGuide = ref(false);
+
+// Carrusel de imágenes
+const currentImageIndex = ref(0);
+
+// Computed: todas las imágenes del producto (principal + adicionales)
+const allImages = computed(() => {
+  const images: string[] = [];
+  if (product.value?.image) {
+    images.push(product.value.image);
+  }
+  if (product.value?.images && Array.isArray(product.value.images)) {
+    const sortedImages = [...product.value.images].sort((a, b) => a.order - b.order);
+    sortedImages.forEach(img => {
+      if (img.url) images.push(img.url);
+    });
+  }
+  return images;
+});
+
+// Computed: imagen actual mostrada
+const currentImage = computed(() => {
+  return allImages.value[currentImageIndex.value] || null;
+});
+
+// Funciones de navegación del carrusel
+const nextImage = () => {
+  if (currentImageIndex.value < allImages.value.length - 1) {
+    currentImageIndex.value++;
+  }
+};
+
+const previousImage = () => {
+  if (currentImageIndex.value > 0) {
+    currentImageIndex.value--;
+  }
+};
 
 // Productos de ejemplo (mismos que en index.vue)
 const getExampleProducts = (): Product[] => {
