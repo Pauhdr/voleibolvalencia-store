@@ -1709,24 +1709,32 @@ const exportToExcel = () => {
   }
 
   try {
-    // Preparar los datos para Excel - FORMATO PARA FABRICACIÓN
+    // Preparar los datos para Excel
     const excelData: any[] = [];
 
     // Encabezados
     const headers = [
+      'Nº Pedido',
+      'Fecha',
+      'Jugador',
+      'Padre/Madre',
+      'Email',
       'Producto',
       'Talla',
       'Género',
-      'Número Dorsal',
-      'Nombre/Texto',
+      'Número',
+      'Texto',
       'Cantidad',
+      'Estado',
     ];
     excelData.push(headers);
 
     // Recorrer todos los pedidos filtrados
     filteredOrders.value.forEach((order) => {
-      // Obtener estado en español desde ORDER_STATUS_LABELS
-      const estado = ORDER_STATUS_LABELS[order.status as OrderStatus] || order.status || 'N/A';
+      // Número de pedido con formato #0001
+      const numeroPedido = order.order_number 
+        ? `#${String(order.order_number).padStart(4, '0')}`
+        : order.id?.substring(0, 8).toUpperCase() || 'N/A';
 
       // Fecha formateada
       const fecha = order.created_at 
@@ -1737,20 +1745,26 @@ const exportToExcel = () => {
           })
         : 'N/A';
 
+      // Obtener estado en español desde ORDER_STATUS_LABELS
+      const estado = ORDER_STATUS_LABELS[order.status as OrderStatus] || order.status || 'N/A';
+
       // Recorrer cada producto del pedido
       order.items?.forEach((item) => {
-        // Para cada unidad del producto (si cantidad > 1, crear múltiples filas)
-        for (let i = 0; i < item.quantity; i++) {
-          const fila = [
-            item.name || 'Sin nombre',
-            item.options?.talla || '-',
-            item.options?.genero || '-',
-            item.options?.numero || '-',
-            item.options?.nombre || '-',
-            1
-          ];
-          excelData.push(fila);
-        }
+        const fila = [
+          numeroPedido,
+          fecha,
+          order.player_name || 'N/A',
+          order.parent_name || '-',
+          order.email || 'N/A',
+          item.name || 'Sin nombre',
+          item.options?.talla || '-',
+          item.options?.genero || '-',
+          item.options?.numero || '-',
+          item.options?.nombre || '-',
+          item.quantity || 1,
+          estado,
+        ];
+        excelData.push(fila);
       });
     });
 
