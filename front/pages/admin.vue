@@ -901,22 +901,110 @@
                 </label>
 
                 <div v-if="productForm.options.hasTalla" class="ml-8 space-y-3">
-                  <p class="text-sm text-gray-600">Selecciona las tallas disponibles:</p>
-                  <div class="grid grid-cols-4 gap-2">
-                    <label
-                      v-for="size in availableSizes"
-                      :key="size"
-                      class="flex items-center space-x-2"
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm text-gray-600">Gestiona las tallas del producto:</p>
+                    <button
+                      type="button"
+                      @click="addNewSize"
+                      class="btn-outline text-xs flex items-center gap-1"
                     >
-                      <input
-                        type="checkbox"
-                        :value="size"
-                        v-model="productForm.options.tallas"
-                        class="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
-                      />
-                      <span class="text-sm">{{ size }}</span>
-                    </label>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Nueva talla
+                    </button>
                   </div>
+
+                  <!-- Tallas predefinidas (selección rápida) -->
+                  <div class="bg-white p-3 rounded border border-gray-200">
+                    <p class="text-xs font-semibold text-gray-700 mb-2">Tallas estándar (click para añadir):</p>
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        v-for="size in availableSizes"
+                        :key="size"
+                        type="button"
+                        @click="toggleStandardSize(size)"
+                        :class="[
+                          'px-2 py-1 text-xs rounded border transition-colors',
+                          productForm.options.tallas.includes(size)
+                            ? 'bg-orange-600 text-white border-orange-600'
+                            : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
+                        ]"
+                      >
+                        {{ size }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tallas seleccionadas (con reordenación) -->
+                  <div v-if="productForm.options.tallas.length > 0" class="bg-white p-3 rounded border border-gray-200">
+                    <p class="text-xs font-semibold text-gray-700 mb-2">Tallas del producto (arrastra para reordenar):</p>
+                    <div class="space-y-2">
+                      <div
+                        v-for="(size, index) in productForm.options.tallas"
+                        :key="index"
+                        class="flex items-center gap-2 bg-gray-50 p-2 rounded group hover:bg-gray-100"
+                        draggable="true"
+                        @dragstart="handleDragStart(index)"
+                        @dragover.prevent
+                        @drop="handleDrop(index)"
+                      >
+                        <!-- Handle para arrastrar -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-move" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                        
+                        <!-- Input para editar la talla -->
+                        <input
+                          v-model="productForm.options.tallas[index]"
+                          type="text"
+                          class="input-field text-sm flex-1 size-input"
+                          placeholder="Nombre de la talla"
+                        />
+
+                        <!-- Botones de orden -->
+                        <div class="flex gap-1">
+                          <button
+                            type="button"
+                            @click="moveSizeUp(index)"
+                            :disabled="index === 0"
+                            class="p-1 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Subir"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            @click="moveSizeDown(index)"
+                            :disabled="index === productForm.options.tallas.length - 1"
+                            class="p-1 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Bajar"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        <!-- Botón eliminar -->
+                        <button
+                          type="button"
+                          @click="removeSize(index)"
+                          class="p-1 text-red-600 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Eliminar"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <p v-else class="text-xs text-gray-500 text-center py-2">
+                    No hay tallas seleccionadas. Usa las tallas estándar o crea una nueva.
+                  </p>
                 </div>
               </div>
 
@@ -1635,14 +1723,11 @@ const syncSizeChartWithSelectedSizes = () => {
         }
       });
       
-      // Ordenar filas por talla
+      // Ordenar filas según el orden de selectedSizes (orden del usuario)
       productForm.value.size_chart[genderKey]!.rows.sort((a, b) => {
-        const indexA = availableSizes.indexOf(a.size);
-        const indexB = availableSizes.indexOf(b.size);
-        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-        if (indexA !== -1) return -1;
-        if (indexB !== -1) return 1;
-        return a.size.localeCompare(b.size);
+        const indexA = selectedSizes.indexOf(a.size);
+        const indexB = selectedSizes.indexOf(b.size);
+        return indexA - indexB;
       });
     });
   } else {
@@ -1669,14 +1754,11 @@ const syncSizeChartWithSelectedSizes = () => {
       }
     });
     
-    // Ordenar filas por talla
+    // Ordenar filas según el orden de selectedSizes (orden del usuario)
     productForm.value.size_chart.rows.sort((a, b) => {
-      const indexA = availableSizes.indexOf(a.size);
-      const indexB = availableSizes.indexOf(b.size);
-      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-      if (indexA !== -1) return -1;
-      if (indexB !== -1) return 1;
-      return a.size.localeCompare(b.size);
+      const indexA = selectedSizes.indexOf(a.size);
+      const indexB = selectedSizes.indexOf(b.size);
+      return indexA - indexB;
     });
   }
 };
@@ -2032,6 +2114,80 @@ const toggleOrderDetails = (orderId: string) => {
   }
 };
 
+// ============ FUNCIONES DE GESTIÓN DE TALLAS ============
+
+// Estado para drag and drop
+const draggedSizeIndex = ref<number | null>(null);
+
+// Añadir una nueva talla vacía
+const addNewSize = () => {
+  productForm.value.options.tallas.push('');
+  // Enfocar el input después de que se renderice
+  nextTick(() => {
+    const inputs = document.querySelectorAll('.size-input');
+    const lastInput = inputs[inputs.length - 1] as HTMLInputElement;
+    if (lastInput) lastInput.focus();
+  });
+};
+
+// Toggle de talla estándar
+const toggleStandardSize = (size: string) => {
+  const index = productForm.value.options.tallas.indexOf(size);
+  if (index > -1) {
+    // Ya está, la eliminamos
+    productForm.value.options.tallas.splice(index, 1);
+  } else {
+    // No está, la añadimos
+    productForm.value.options.tallas.push(size);
+  }
+};
+
+// Eliminar una talla
+const removeSize = (index: number) => {
+  if (confirm(`¿Eliminar la talla "${productForm.value.options.tallas[index]}"?`)) {
+    productForm.value.options.tallas.splice(index, 1);
+  }
+};
+
+// Mover talla hacia arriba
+const moveSizeUp = (index: number) => {
+  if (index > 0) {
+    const tallas = [...productForm.value.options.tallas];
+    [tallas[index - 1], tallas[index]] = [tallas[index], tallas[index - 1]];
+    productForm.value.options.tallas = tallas;
+  }
+};
+
+// Mover talla hacia abajo
+const moveSizeDown = (index: number) => {
+  if (index < productForm.value.options.tallas.length - 1) {
+    const tallas = [...productForm.value.options.tallas];
+    [tallas[index], tallas[index + 1]] = [tallas[index + 1], tallas[index]];
+    productForm.value.options.tallas = tallas;
+  }
+};
+
+// Drag and drop handlers
+const handleDragStart = (index: number) => {
+  draggedSizeIndex.value = index;
+};
+
+const handleDrop = (dropIndex: number) => {
+  if (draggedSizeIndex.value !== null && draggedSizeIndex.value !== dropIndex) {
+    const tallas = [...productForm.value.options.tallas];
+    const draggedItem = tallas[draggedSizeIndex.value];
+    
+    // Eliminar del índice original
+    tallas.splice(draggedSizeIndex.value, 1);
+    
+    // Insertar en el nuevo índice
+    tallas.splice(dropIndex, 0, draggedItem);
+    
+    productForm.value.options.tallas = tallas;
+  }
+  draggedSizeIndex.value = null;
+};
+
 // ============ FUNCIONES DE PRODUCTOS ============
 
 // Cargar productos
@@ -2276,12 +2432,10 @@ const saveProduct = async () => {
   savingProduct.value = true;
 
   try {
-    // Ordenar tallas antes de guardar
-    if (productForm.value.options.hasTalla && productForm.value.options.tallas.length > 0) {
-      productForm.value.options.tallas = sortSizes(productForm.value.options.tallas);
-    }
-
-    // Sincronizar y ordenar tallas en la tabla de tallas
+    // Ya no ordenamos automáticamente - respetamos el orden definido por el usuario
+    // Si el usuario quiere ordenar, puede usar los botones de reordenar
+    
+    // Sincronizar tallas en la tabla de tallas (respetando el orden del usuario)
     if (productForm.value.size_chart.enabled) {
       syncSizeChartWithSelectedSizes();
     }
