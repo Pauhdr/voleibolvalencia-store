@@ -28,10 +28,17 @@ export interface SizeChart {
   enabled: boolean;                    // Si está habilitada para este producto
   unit: 'cm' | 'inches';              // Unidad de medida
   hasSeparateGenders: boolean;        // Si tiene tablas separadas para chico/chica
-  // Tabla única (si hasSeparateGenders = false)
+  // Imágenes de tabla de tallas
+  image?: string;                     // URL pública de la imagen unisex
+  image_path?: string;                // Path del archivo en Supabase Storage (unisex)
+  boys_image?: string;                // URL pública de la imagen para chicos
+  boys_image_path?: string;           // Path del archivo en Supabase Storage (chicos)
+  girls_image?: string;               // URL pública de la imagen para chicas
+  girls_image_path?: string;          // Path del archivo en Supabase Storage (chicas)
+  // Tabla única (si hasSeparateGenders = false) - DEPRECADO
   columns?: SizeChartColumn[];        // Columnas de medidas (ej: Pecho, Cintura, Largo)
   rows?: SizeChartRow[];              // Filas con tallas y medidas
-  // Tablas separadas por género (si hasSeparateGenders = true)
+  // Tablas separadas por género (si hasSeparateGenders = true) - DEPRECADO
   boys?: {
     columns: SizeChartColumn[];
     rows: SizeChartRow[];

@@ -47,6 +47,28 @@ export const useSupabase = () => {
           console.log("urlData.publicUrl:", urlData.publicUrl)
           product.image = urlData.publicUrl
         }
+
+        // Generar URLs públicas para las imágenes del size_chart
+        if (product.size_chart) {
+          if (product.size_chart.image_path) {
+            const { data: urlData } = supabase.storage
+              .from('products')
+              .getPublicUrl(product.size_chart.image)
+            product.size_chart.image = urlData.publicUrl
+          }
+          if (product.size_chart.boys_image) {
+            const { data: urlData } = supabase.storage
+              .from('products')
+              .getPublicUrl(product.size_chart.boys_image_path)
+            product.size_chart.boys_image = urlData.publicUrl
+          }
+          if (product.size_chart.girls_image_path) {
+            const { data: urlData } = supabase.storage
+              .from('products')
+              .getPublicUrl(product.size_chart.girls_image_path)
+            product.size_chart.girls_image = urlData.publicUrl
+          }
+        }
         
         return product
       }))
@@ -92,13 +114,30 @@ export const useSupabase = () => {
         
         product.image = urlData.publicUrl
       }
+
+      // Generar URLs públicas para las imágenes del size_chart
+      if (product.size_chart) {
+        if (product.size_chart.image_path) {
+          const { data: urlData } = supabase.storage
+            .from('products')
+            .getPublicUrl(product.size_chart.image_path)
+          product.size_chart.image = urlData.publicUrl
+        }
+        if (product.size_chart.boys_image_path) {
+          const { data: urlData } = supabase.storage
+            .from('products')
+            .getPublicUrl(product.size_chart.boys_image_path)
+          product.size_chart.boys_image = urlData.publicUrl
+        }
+        if (product.size_chart.girls_image_path) {
+          const { data: urlData } = supabase.storage
+            .from('products')
+            .getPublicUrl(product.size_chart.girls_image_path)
+          product.size_chart.girls_image = urlData.publicUrl
+        }
+      }
       
-      console.log('✅ Producto cargado desde BD:', {
-        name: product.name,
-        size_chart_enabled: product.size_chart?.enabled,
-        size_chart_hasSeparateGenders: product.size_chart?.hasSeparateGenders,
-        size_chart: product.size_chart
-      });
+      console.log('✅ Producto cargado desde BD:', product);
       return product
     } catch (error) {
       console.error('❌ Error fetching product:', error)
@@ -287,6 +326,29 @@ export const useSupabase = () => {
   const createProduct = async (productData: any): Promise<boolean> => {
     try {
       console.log('💾 Guardando producto en BD:', productData);
+      
+      // Si hay size_chart con imágenes, generar URLs públicas
+      if (productData.size_chart) {
+        if (productData.size_chart.image_path) {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(productData.size_chart.image_path);
+          productData.size_chart.image = data.publicUrl;
+        }
+        if (productData.size_chart.boys_image_path) {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(productData.size_chart.boys_image_path);
+          productData.size_chart.boys_image = data.publicUrl;
+        }
+        if (productData.size_chart.girls_image_path) {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(productData.size_chart.girls_image_path);
+          productData.size_chart.girls_image = data.publicUrl;
+        }
+      }
+
       const { error } = await supabase
         .from('products')
         .insert({
@@ -317,6 +379,29 @@ export const useSupabase = () => {
   const updateProduct = async (productId: string, productData: any): Promise<boolean> => {
     try {
       console.log('💾 Actualizando producto en BD:', productData);
+      
+      // Si hay size_chart con imágenes, generar URLs públicas
+      if (productData.size_chart) {
+        if (productData.size_chart.image_path) {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(productData.size_chart.image_path);
+          productData.size_chart.image = data.publicUrl;
+        }
+        if (productData.size_chart.boys_image_path) {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(productData.size_chart.boys_image_path);
+          productData.size_chart.boys_image = data.publicUrl;
+        }
+        if (productData.size_chart.girls_image_path) {
+          const { data } = supabase.storage
+            .from('products')
+            .getPublicUrl(productData.size_chart.girls_image_path);
+          productData.size_chart.girls_image = data.publicUrl;
+        }
+      }
+
       const { error } = await supabase
         .from('products')
         .update({
@@ -365,11 +450,11 @@ export const useSupabase = () => {
   }
 
   // Subir imagen a Storage
-  const uploadProductImage = async (file: File): Promise<string | null> => {
+  const uploadProductImage = async (file: File, prefix: string = 'product'): Promise<string | null> => {
     try {
       // Generar nombre único para el archivo
       const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      const fileName = `${prefix}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
       const filePath = `${fileName}`
 
       // Subir archivo

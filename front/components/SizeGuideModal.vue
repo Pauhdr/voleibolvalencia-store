@@ -27,68 +27,73 @@
 
         <!-- Contenido -->
         <div class="p-6 space-y-6">
-          <!-- Tabla de tallas personalizada - Género unificado -->
-          <div v-if="sizeChart && sizeChart.enabled && !sizeChart.hasSeparateGenders && sizeChart.rows && sizeChart.rows.length > 0">
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-300">
-                <thead class="bg-orange-50">
-                  <tr>
-                    <th class="border border-gray-300 px-4 py-2 text-left font-semibold">Talla</th>
-                    <th 
-                      v-for="column in sizeChart.columns" 
-                      :key="column.id"
-                      class="border border-gray-300 px-4 py-2 text-left font-semibold"
-                    >
-                      {{ column.name }} ({{ sizeChart.unit }})
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(row, index) in sizeChart.rows" :key="index" class="hover:bg-gray-50">
-                    <td class="border border-gray-300 px-4 py-2 font-medium">{{ row.size }}</td>
-                    <td 
-                      v-for="column in sizeChart.columns" 
-                      :key="column.id"
-                      class="border border-gray-300 px-4 py-2"
-                    >
-                      {{ row.measurements[column.id] || '-' }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <!-- NUEVO SISTEMA: Imágenes de guía de tallas -->
+          <template v-if="sizeChart && sizeChart.enabled && (sizeChart.image || sizeChart.boys_image || sizeChart.girls_image)">
+            <!-- Imagen unisex -->
+            <div v-if="!sizeChart.hasSeparateGenders && sizeChart.image" class="space-y-4">
+              <img 
+                :src="sizeChart.image" 
+                alt="Guía de tallas"
+                class="w-full h-auto rounded-lg shadow-lg border border-gray-200"
+              />
             </div>
-          </div>
 
-          <!-- Tablas personalizadas separadas por género -->
-          <template v-if="sizeChart && sizeChart.enabled && sizeChart.hasSeparateGenders">
-            <!-- Aviso importante para tablas separadas -->
-            <div class="bg-orange-50 border-l-4 border-orange-600 p-4 rounded">
-              <div class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div>
-                  <p class="font-bold text-orange-900 mb-1">¡IMPORTANTE!</p>
-                  <p class="text-orange-800">
-                    Este producto tiene <strong>tablas de tallas diferentes para chico y chica</strong>. Por favor, consulta la tabla correspondiente al género seleccionado.
-                  </p>
+            <!-- Imágenes separadas por género -->
+            <template v-else-if="sizeChart.hasSeparateGenders">
+              <!-- Aviso importante -->
+              <div class="bg-orange-50 border-l-4 border-orange-600 p-4 rounded-lg">
+                <div class="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <p class="font-bold text-orange-900 mb-1">¡IMPORTANTE!</p>
+                    <p class="text-orange-800">
+                      Este producto tiene <strong>tablas de tallas diferentes para chico y chica</strong>. Por favor, consulta la tabla correspondiente al género seleccionado.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Tabla Chico personalizada -->
-            <div v-if="sizeChart.boys && sizeChart.boys.rows.length > 0">
-              <h3 class="text-xl font-display font-bold text-gray-900 mb-3 flex items-center">
-                <span class="bg-blue-600 text-white px-3 py-1 rounded-lg mr-2">Chico</span>
-                Guía de Tallas
-              </h3>
+              <!-- Imagen para chicos -->
+              <div v-if="sizeChart.boys_image" class="space-y-3">
+                <h3 class="text-xl font-display font-bold text-gray-900 flex items-center">
+                  <span class="bg-blue-600 text-white px-3 py-1 rounded-lg mr-2">Chico</span>
+                  Guía de Tallas
+                </h3>
+                <img 
+                  :src="sizeChart.boys_image" 
+                  alt="Guía de tallas para chicos"
+                  class="w-full h-auto rounded-lg border-2 border-blue-200"
+                />
+              </div>
+
+              <!-- Imagen para chicas -->
+              <div v-if="sizeChart.girls_image" class="space-y-3">
+                <h3 class="text-xl font-display font-bold text-gray-900 flex items-center">
+                  <span class="bg-pink-600 text-white px-3 py-1 rounded-lg mr-2">Chica</span>
+                  Guía de Tallas
+                </h3>
+                <img 
+                  :src="sizeChart.girls_image" 
+                  alt="Guía de tallas para chicas"
+                  class="w-full h-auto rounded-lg border-2 border-pink-200"
+                />
+              </div>
+            </template>
+          </template>
+
+          <!-- SISTEMA ANTIGUO: Tablas dinámicas (compatibilidad con productos antiguos) -->
+          <template v-else-if="sizeChart && sizeChart.enabled && (sizeChart.rows || sizeChart.boys?.rows || sizeChart.girls?.rows)">
+            <!-- Tabla de tallas personalizada - Género unificado -->
+            <div v-if="!sizeChart.hasSeparateGenders && sizeChart.rows && sizeChart.rows.length > 0">
               <div class="overflow-x-auto">
                 <table class="w-full border-collapse border border-gray-300">
-                  <thead class="bg-blue-50">
+                  <thead class="bg-orange-50">
                     <tr>
                       <th class="border border-gray-300 px-4 py-2 text-left font-semibold">Talla</th>
                       <th 
-                        v-for="column in sizeChart.boys.columns" 
+                        v-for="column in sizeChart.columns" 
                         :key="column.id"
                         class="border border-gray-300 px-4 py-2 text-left font-semibold"
                       >
@@ -97,10 +102,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(row, index) in sizeChart.boys.rows" :key="index" class="hover:bg-gray-50">
+                    <tr v-for="(row, index) in sizeChart.rows" :key="index" class="hover:bg-gray-50">
                       <td class="border border-gray-300 px-4 py-2 font-medium">{{ row.size }}</td>
                       <td 
-                        v-for="column in sizeChart.boys.columns" 
+                        v-for="column in sizeChart.columns" 
                         :key="column.id"
                         class="border border-gray-300 px-4 py-2"
                       >
@@ -112,41 +117,95 @@
               </div>
             </div>
 
-            <!-- Tabla Chica personalizada -->
-            <div v-if="sizeChart.girls && sizeChart.girls.rows.length > 0">
-              <h3 class="text-xl font-display font-bold text-gray-900 mb-3 flex items-center">
-                <span class="bg-pink-600 text-white px-3 py-1 rounded-lg mr-2">Chica</span>
-                Guía de Tallas
-              </h3>
-              <div class="overflow-x-auto">
-                <table class="w-full border-collapse border border-gray-300">
-                  <thead class="bg-pink-50">
-                    <tr>
-                      <th class="border border-gray-300 px-4 py-2 text-left font-semibold">Talla</th>
-                      <th 
-                        v-for="column in sizeChart.girls.columns" 
-                        :key="column.id"
-                        class="border border-gray-300 px-4 py-2 text-left font-semibold"
-                      >
-                        {{ column.name }} ({{ sizeChart.unit }})
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(row, index) in sizeChart.girls.rows" :key="index" class="hover:bg-gray-50">
-                      <td class="border border-gray-300 px-4 py-2 font-medium">{{ row.size }}</td>
-                      <td 
-                        v-for="column in sizeChart.girls.columns" 
-                        :key="column.id"
-                        class="border border-gray-300 px-4 py-2"
-                      >
-                        {{ row.measurements[column.id] || '-' }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+            <!-- Tablas separadas por género -->
+            <template v-if="sizeChart.hasSeparateGenders">
+              <!-- Aviso importante -->
+              <div class="bg-orange-50 border-l-4 border-orange-600 p-4 rounded">
+                <div class="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <p class="font-bold text-orange-900 mb-1">¡IMPORTANTE!</p>
+                    <p class="text-orange-800">
+                      Este producto tiene <strong>tablas de tallas diferentes para chico y chica</strong>. Por favor, consulta la tabla correspondiente al género seleccionado.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
+
+              <!-- Tabla Chico -->
+              <div v-if="sizeChart.boys && sizeChart.boys.rows && sizeChart.boys.rows.length > 0">
+                <h3 class="text-xl font-display font-bold text-gray-900 mb-3 flex items-center">
+                  <span class="bg-blue-600 text-white px-3 py-1 rounded-lg mr-2">Chico</span>
+                  Guía de Tallas
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full border-collapse border border-gray-300">
+                    <thead class="bg-blue-50">
+                      <tr>
+                        <th class="border border-gray-300 px-4 py-2 text-left font-semibold">Talla</th>
+                        <th 
+                          v-for="column in sizeChart.boys.columns" 
+                          :key="column.id"
+                          class="border border-gray-300 px-4 py-2 text-left font-semibold"
+                        >
+                          {{ column.name }} ({{ sizeChart.unit }})
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(row, index) in sizeChart.boys.rows" :key="index" class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2 font-medium">{{ row.size }}</td>
+                        <td 
+                          v-for="column in sizeChart.boys.columns" 
+                          :key="column.id"
+                          class="border border-gray-300 px-4 py-2"
+                        >
+                          {{ row.measurements[column.id] || '-' }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Tabla Chica -->
+              <div v-if="sizeChart.girls && sizeChart.girls.rows && sizeChart.girls.rows.length > 0">
+                <h3 class="text-xl font-display font-bold text-gray-900 mb-3 flex items-center">
+                  <span class="bg-pink-600 text-white px-3 py-1 rounded-lg mr-2">Chica</span>
+                  Guía de Tallas
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full border-collapse border border-gray-300">
+                    <thead class="bg-pink-50">
+                      <tr>
+                        <th class="border border-gray-300 px-4 py-2 text-left font-semibold">Talla</th>
+                        <th 
+                          v-for="column in sizeChart.girls.columns" 
+                          :key="column.id"
+                          class="border border-gray-300 px-4 py-2 text-left font-semibold"
+                        >
+                          {{ column.name }} ({{ sizeChart.unit }})
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(row, index) in sizeChart.girls.rows" :key="index" class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2 font-medium">{{ row.size }}</td>
+                        <td 
+                          v-for="column in sizeChart.girls.columns" 
+                          :key="column.id"
+                          class="border border-gray-300 px-4 py-2"
+                        >
+                          {{ row.measurements[column.id] || '-' }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </template>
           </template>
 
           <!-- Tablas por defecto si no hay tabla personalizada -->
