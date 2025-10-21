@@ -423,7 +423,7 @@
                 :checked="selectedOrders.includes(order.id!)"
                 @change="toggleOrderSelection(order.id!)"
                 @click.stop
-                class="appearance-none w-5 h-5 border border-gray-200 checked:border-orange-500 rounded focus:ring-orange-500 checked:bg-orange-500 flex-shrink-0"
+                class="appearance-none w-5 h-5 border border-gray-400 checked:border-orange-500 rounded focus:ring-orange-500 checked:bg-orange-500 flex-shrink-0"
               />
 
               <!-- Botón expandir/colapsar -->
