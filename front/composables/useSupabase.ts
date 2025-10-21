@@ -176,9 +176,46 @@ export const useSupabase = () => {
   }
 
   // Pedidos
+  
+  // Función para obtener el siguiente número de pedido
+  const getNextOrderNumber = async (): Promise<number> => {
+    try {
+      // Obtener el último número de pedido
+      const { data, error } = await supabase
+        .from('orders')
+        .select('order_number')
+        .order('order_number', { ascending: false })
+        .limit(1)
+        .single()
+      
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('❌ Error getting last order number:', error)
+        return 1 // Empezar desde 1 si hay error
+      }
+      
+      // Si no hay pedidos, empezar desde 1
+      if (!data || !data.order_number) {
+        return 1
+      }
+      
+      // Incrementar el último número
+      const nextNumber = data.order_number + 1
+      
+      // Si supera 9999, volver a 1
+      return nextNumber > 9999 ? 1 : nextNumber
+    } catch (error) {
+      console.error('❌ Error getting next order number:', error)
+      return 1
+    }
+  }
+
   const createOrder = async (orderData: any): Promise<Order | null> => {
     try {
       console.log('📦 Datos recibidos en createOrder:', orderData)
+      
+      // Obtener el siguiente número de pedido
+      const orderNumber = await getNextOrderNumber()
+      console.log('🔢 Número de pedido asignado:', orderNumber)
       
       let proofPath = null
       
@@ -210,6 +247,7 @@ export const useSupabase = () => {
       const { data, error } = await supabase
         .from('orders')
         .insert({
+          order_number: orderNumber,
           player_name: orderData.player_name,
           team: orderData.team,
           parent_name: orderData.parent_name,

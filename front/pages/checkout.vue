@@ -503,6 +503,8 @@ const handleSubmit = async () => {
     const order = await createOrder(orderData);
 
     if (order) {
+      console.log('✅ Pedido creado con número:', order.order_number);
+      
       // Guardar datos del pedido en localStorage para la página de éxito
       const orderForReceipt = {
         buyer: {
@@ -520,7 +522,7 @@ const handleSubmit = async () => {
         })),
         total: cartStore.total,
         date: new Date().toISOString(),
-        orderNumber: order.id,
+        orderNumber: order.order_number || order.id, // Usar order_number si existe, sino el id
       };
       localStorage.setItem('lastOrder', JSON.stringify(orderForReceipt));
       

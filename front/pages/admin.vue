@@ -445,8 +445,13 @@
 
               <!-- Información principal -->
               <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
-                <!-- Nombre jugador -->
+                <!-- Nombre jugador + Número de pedido -->
                 <div class="min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-orange-100 text-orange-800 text-xs font-bold">
+                      #{{ order.order_number ? String(order.order_number).padStart(4, '0') : order.id?.substring(0, 4).toUpperCase() }}
+                    </span>
+                  </div>
                   <p class="text-sm md:text-md font-semibold text-gray-900 truncate">{{ order.player_name }}</p>
                   <p class="text-sm text-gray-500 truncate">{{ order.team }}</p>
                 </div>

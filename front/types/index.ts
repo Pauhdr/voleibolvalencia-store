@@ -93,6 +93,7 @@ export interface BuyerData {
 
 export interface Order {
   id?: string;
+  order_number?: number;  // Número de pedido consecutivo de 4 dígitos
   player_name: string;
   team: string;
   parent_name: string;

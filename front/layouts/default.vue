@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between">
           <!-- Logo y título -->
           <NuxtLink to="/" class="flex items-center space-x-3 group">
-            <div class="w-12 h-12 rounded-full flex items-center justify-center">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center">
               <!-- <span class="text-white font-bold text-xl">VV</span> -->
                <img src="../assets/img/logo.png" alt="cvv logo" class="rounded-full object-fill">
             </div>
@@ -84,9 +84,6 @@
             <h3 class="font-display font-bold text-lg mb-3">Contacto</h3>
             <p class="text-gray-400 text-sm">
               Email: tienda@voleibolvalencia.com
-            </p>
-            <p class="text-gray-400 text-sm mt-1">
-              Tel: 963 XXX XXX
             </p>
           </div>
         </div>
