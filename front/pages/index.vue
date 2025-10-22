@@ -2,7 +2,7 @@
   <div class="container-custom py-12">
     <!-- Header -->
     <div class="mb-12 text-center">
-      <h1 class="text-5xl font-display font-bold text-gray-900 mb-3">
+      <h1 class="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-3">
         Tienda Oficial
       </h1>
       <p class="text-lg text-gray-600">
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Productos -->
-    <div v-else-if="products.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+    <div v-else-if="products.length > 0" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-10">
       <ProductCard
         v-for="product in products"
         :key="product.id"

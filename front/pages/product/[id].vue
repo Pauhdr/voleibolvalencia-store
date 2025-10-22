@@ -35,7 +35,7 @@
                 v-if="currentImage"
                 :src="currentImage"
                 :alt="product.name"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-contain mix-blend-multiply"
               />
               <div v-else class="text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-32 w-32 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

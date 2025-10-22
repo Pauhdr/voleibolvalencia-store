@@ -10,7 +10,7 @@
           v-if="product.image"
           :src="product.image"
           :alt="product.name"
-          class="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90 rounded-2xl"
+          class="h-full w-full object-contain transition-opacity duration-300 group-hover:opacity-90 rounded-2xl mix-blend-multiply  p-2 md:p-6"
         />
         <div
           v-else
@@ -36,13 +36,13 @@
       <!-- Contenido -->
       <div class="p-2">
         <!-- Nombre del producto -->
-        <h3 class="text-sm font-semibold text-gray-900 mb-1 transition-colors">
+        <h3 class="text-md font-semibold text-gray-900 mb-1 transition-colors">
           {{ product.name }}
         </h3>
 
         <!-- Precio -->
         <div class="flex items-baseline justify-between">
-          <p class="text-xl">
+          <p class="text-md">
             {{ product.price.toFixed(2) }}€
           </p>
           
