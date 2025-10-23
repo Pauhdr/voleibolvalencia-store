@@ -16,14 +16,28 @@
 
     <!-- Producto -->
     <div v-else-if="product" class="max-w-6xl mx-auto pb-24 md:pb-0">
-      <!-- Breadcrumb -->
-      <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-        <NuxtLink to="/" class="hover:text-orange-600 transition-colors">
-          Inicio
+      <!-- Header con Breadcrumb y Botón de Volver -->
+      <div class="flex items-center justify-between mb-6">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm text-gray-600">
+          <NuxtLink to="/" class="hover:text-orange-600 transition-colors">
+            Inicio
+          </NuxtLink>
+          <span>/</span>
+          <span class="text-gray-900 font-medium">{{ product.name }}</span>
+        </nav>
+
+        <!-- Botón Volver a la Tienda -->
+        <NuxtLink 
+          to="/" 
+          class="btn-outline flex items-center gap-2 text-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Volver a la Tienda
         </NuxtLink>
-        <span>/</span>
-        <span class="text-gray-900 font-medium">{{ product.name }}</span>
-      </nav>
+      </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 h-full">
         <!-- Columna izquierda - Galería de Imágenes -->
