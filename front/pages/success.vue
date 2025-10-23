@@ -24,7 +24,7 @@
         </p>
         <div class="space-y-2 text-gray-700">
           <p>
-            <strong>Email:</strong> tienda@voleibolvalencia.com
+            <strong>Email:</strong> info@voleibolvalencia.com
           </p>
           <!-- <p>
             <strong>Teléfono:</strong> 963 XXX XXX

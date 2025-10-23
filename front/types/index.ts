@@ -138,9 +138,11 @@ export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
 export const TEAMS = [
   'Benjamín',
   'Alevín',
-  'Infantil Femenino',
+  'Infantil Femenino 1',
+  'Infantil Femenino 2',
   'Infantil Masculino',
-  'Cadete Femenino',
+  'Cadete Femenino 1',
+  'Cadete Femenino 2',
   'Cadete Masculino',
   'Juvenil Femenino',
   'Juvenil Masculino',
@@ -148,6 +150,7 @@ export const TEAMS = [
   'Junior Masculino',
   'Senior Femenino',
   'Senior Masculino',
+  'Nacional Masculino'
 ] as const;
 
 export type Team = typeof TEAMS[number];
