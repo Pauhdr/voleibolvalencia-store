@@ -196,11 +196,16 @@
               <div class="space-y-3">
                 <div>
                   <p class="text-sm text-gray-700">IBAN:</p>
-                  <p class="text-sm font-mono font-semibold text-gray-900">ES12 3456 7890 1234 5678 9012</p>
+                  <p class="text-sm font-mono font-semibold text-gray-900">ES03 3159 0010 5316 7296 0414</p>
                 </div>
                 
                 <div>
                   <p class="text-sm  text-gray-700">Beneficiario:</p>
+                  <p class="text-sm font-semibold text-gray-900">Club Voleibol Valencia</p>
+                </div>
+
+                <div>
+                  <p class="text-sm  text-gray-700">Titular:</p>
                   <p class="text-sm font-semibold text-gray-900">Club Voleibol Valencia</p>
                 </div>
                 
