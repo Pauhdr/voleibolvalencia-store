@@ -256,7 +256,9 @@ export const useSupabase = () => {
           items: items,
           total: orderData.total,
           status: 'en_revision',
-          payment_proof_path: proofPath
+          payment_proof_path: proofPath,
+          dni: orderData.dni,
+          direccion: orderData.address,
         })
         .select()
         .single()

@@ -510,13 +510,21 @@
                       <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Equipo</p>
                       <p class="font-semibold text-gray-900">{{ order.team }}</p>
                     </div>
-                    <div>
+                    <div v-if="order.parent_name !== ''">
                       <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Padre/Madre</p>
                       <p class="font-semibold text-gray-900">{{ order.parent_name }}</p>
                     </div>
                     <div>
                       <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Email</p>
                       <p class="font-semibold text-gray-900">{{ order.email }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">DNI</p>
+                      <p class="font-semibold text-gray-900">{{ order.dni }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Dirección</p>
+                      <p class="font-semibold text-gray-900">{{ order.direccion }}</p>
                     </div>
                     <div>
                       <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Total</p>
@@ -1840,9 +1848,12 @@ const exportToExcel = () => {
     const headers = [
       'Nº Pedido',
       'Fecha',
+      'Equipo',
       'Jugador',
       'Padre/Madre',
       'Email',
+      'DNI',
+      'Dirección',
       'Producto',
       'Talla',
       'Género',
@@ -1877,9 +1888,12 @@ const exportToExcel = () => {
         const fila = [
           numeroPedido,
           fecha,
+          order.team || 'N/A',
           order.player_name || 'N/A',
           order.parent_name || '-',
           order.email || 'N/A',
+          order.dni || '-',
+          order.direccion || '-',
           item.name || 'Sin nombre',
           item.options?.talla || '-',
           item.options?.genero || '-',

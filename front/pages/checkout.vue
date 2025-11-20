@@ -152,6 +152,35 @@
                   placeholder="ejemplo@email.com"
                 />
               </div>
+
+              <!-- DNI -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  DNI/NIE <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="formData.dni"
+                  type="text"
+                  required
+                  class="input-field"
+                  placeholder="12345678A"
+                  maxlength="9"
+                />
+              </div>
+
+              <!-- Dirección -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Dirección <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="formData.address"
+                  type="text"
+                  required
+                  class="input-field"
+                  placeholder="Calle, número, piso"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -375,6 +404,8 @@ const formData = ref({
   team: '',
   parent_name: '',
   email: '',
+  dni: '',
+  address: '',
   transfer_reference: '',
 });
 
@@ -402,6 +433,8 @@ const isFormValid = computed(() => {
     formData.value.player_name &&
     formData.value.team &&
     formData.value.email &&
+    formData.value.dni &&
+    formData.value.address &&
     selectedFile.value !== null
   );
 });
@@ -489,6 +522,8 @@ const handleSubmit = async () => {
       team: formData.value.team,
       parent_name: formData.value.parent_name,
       email: formData.value.email,
+      dni: formData.value.dni,
+      address: formData.value.address,
       transfer_reference: formData.value.transfer_reference || undefined,
       products: cartStore.items,
       total: cartStore.total,
@@ -500,6 +535,8 @@ const handleSubmit = async () => {
       team: orderData.team,
       parent_name: orderData.parent_name,
       email: orderData.email,
+      dni: orderData.dni,
+      address: orderData.address,
       products_count: cartStore.items.length,
       total: orderData.total,
       proof_file: selectedFile.value?.name,

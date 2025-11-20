@@ -98,6 +98,8 @@ export interface Order {
   team: string;
   parent_name: string;
   email: string;
+  dni: string;
+  address: string;
   transfer_reference?: string;
   items: CartItem[];
   payment_proof?: File | string;
